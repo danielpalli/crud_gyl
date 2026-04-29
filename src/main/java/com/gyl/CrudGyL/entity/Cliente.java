@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="clientes")
+@Table(name = "clientes")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -28,5 +28,5 @@ public class Cliente {
     private String telefono;
 
     @Column(nullable = false, length = 100)
-    private String dirreccion;
+    private String direccion;
 }

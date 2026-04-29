@@ -1,14 +1,14 @@
 package com.gyl.CrudGyL.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Entity
-@Table(name="ventas")
+@Table(name = "ventas")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,7 +18,7 @@ public class Venta {
     private Long idVenta;
 
     @Column(nullable = false)
-    private Date fechaVenta;
+    private LocalDate fechaVenta;
 
     @Column(nullable = false)
     private Double total;

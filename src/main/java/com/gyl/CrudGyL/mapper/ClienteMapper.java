@@ -6,34 +6,34 @@ import com.gyl.CrudGyL.entity.Cliente;
 
 public class ClienteMapper {
 
-    private ClienteMapper() {}
+    private ClienteMapper() {
+    }
 
-    public static Cliente toEntity(ClienteRequestDto dto){
+    public static Cliente toEntity(ClienteRequestDto dto) {
         Cliente cliente = new Cliente();
         cliente.setNombre(dto.nombre());
         cliente.setApellido(dto.apellido());
         cliente.setCorreo(dto.correo());
-        cliente.setDirreccion(dto.dirreccion());
+        cliente.setDireccion(dto.direccion());
         cliente.setTelefono(dto.telefono());
         return cliente;
     }
 
-    public static ClienteResponseDto toResponseDto(Cliente cliente){
+    public static ClienteResponseDto toResponseDto(Cliente cliente) {
         return new ClienteResponseDto(
-            cliente.getIdCliente(),
-            cliente.getNombre(),
-            cliente.getApellido(),
-            cliente.getCorreo(),
-            cliente.getDirreccion(),
-            cliente.getTelefono()
-        );
+                cliente.getIdCliente(),
+                cliente.getNombre(),
+                cliente.getApellido(),
+                cliente.getCorreo(),
+                cliente.getDireccion(),
+                cliente.getTelefono());
     }
 
-    public static void updateEntity(Cliente cliente, ClienteRequestDto dto){
+    public static void updateEntity(Cliente cliente, ClienteRequestDto dto) {
         cliente.setNombre(dto.nombre());
         cliente.setApellido(dto.apellido());
         cliente.setCorreo(dto.correo());
-        cliente.setDirreccion(dto.dirreccion());
+        cliente.setDireccion(dto.direccion());
         cliente.setTelefono(dto.telefono());
     }
 }
