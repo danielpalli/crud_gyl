@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="detalle_venta")
+@Table(name = "detalle_venta")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,7 +25,7 @@ public class DetalleVenta {
     private Double subtotal;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_tipo_producto")
+    @JoinColumn(name = "id_venta")
     private Venta venta;
 
     @ManyToOne(cascade = CascadeType.ALL)
