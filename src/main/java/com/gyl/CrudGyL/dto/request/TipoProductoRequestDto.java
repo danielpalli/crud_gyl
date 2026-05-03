@@ -1,4 +1,13 @@
 package com.gyl.CrudGyL.dto.request;
 
-public record TipoProductoRequestDto() {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public record TipoProductoRequestDto(
+    @NotBlank(message = "El nombre no puede estar vacío")
+    String nombre,
+
+    @NotBlank(message = "La descripción no puede estar vacía")
+    String descripcion
+) {
 }

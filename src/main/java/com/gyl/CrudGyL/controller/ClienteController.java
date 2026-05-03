@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("/api/clientes")
 @RequiredArgsConstructor
 public class ClienteController {
-    private ClienteService clienteService;
+    private final ClienteService clienteService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
