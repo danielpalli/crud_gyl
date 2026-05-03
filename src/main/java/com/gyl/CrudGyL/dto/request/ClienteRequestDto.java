@@ -16,7 +16,7 @@ public record ClienteRequestDto(
     @NotBlank(message = "El telefono no puede estar vacio")
     String telefono,
 
-    @NotBlank(message = "La dirreccion no puede estar vacio")
-    String dirreccion
+    @NotBlank(message = "La direccion no puede estar vacio")
+    String direccion
     ) {
 }
