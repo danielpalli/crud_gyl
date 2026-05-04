@@ -12,7 +12,8 @@ import java.util.List;
 
 @Mapper(config = GlobalMapperConfig.class)
 public interface ProductoMapper {
-    @Mapping(source = "idTipoProducto", target = "tipoProducto.idTipoProducto")
+    @Mapping(target = "idProducto", ignore = true)
+    @Mapping(target = "tipoProducto", ignore = true)
     Producto toEntity(ProductoRequestDto dto);
 
     @Mapping(source = "tipoProducto.idTipoProducto", target = "idTipoProducto")
@@ -21,6 +22,7 @@ public interface ProductoMapper {
 
     List<ProductoResponseDto> toDtoList(List<Producto> listEntity);
 
-    @Mapping(source = "idTipoProducto", target = "tipoProducto.idTipoProducto")
+    @Mapping(target = "idProducto", ignore = true)
+    @Mapping(target = "tipoProducto", ignore = true)
     void updateEntity(@MappingTarget Producto entity, ProductoRequestDto dto);
 }

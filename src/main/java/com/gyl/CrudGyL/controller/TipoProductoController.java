@@ -42,7 +42,7 @@ public class TipoProductoController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void eliminar(@PathVariable Long id) {
         tipoProductoService.eliminar(id);
     }
