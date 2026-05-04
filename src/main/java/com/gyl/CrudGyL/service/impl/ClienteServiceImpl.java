@@ -7,60 +7,73 @@ import com.gyl.CrudGyL.exception.RecursoNoEncontradoException;
 import com.gyl.CrudGyL.mapper.ClienteMapper;
 import com.gyl.CrudGyL.repository.ClienteRepository;
 import com.gyl.CrudGyL.service.ClienteService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ClienteServiceImpl implements ClienteService {
-    private ClienteRepository repository;
-
-    public ClienteServiceImpl(ClienteRepository repository){
-        this.repository = repository;
-    }
+    private final ClienteRepository repository;
+    private final ClienteMapper mapper;
 
     @Override
+    @Transactional
     public ClienteResponseDto crear(ClienteRequestDto dto) {
-        Cliente cliente = ClienteMapper.toEntity(dto);
-        Cliente guardado = repository.save(cliente);
+        if (repository.existsByCorreo(dto.correo())) {
+            throw new IllegalArgumentException(
+                "Ya existe un cliente con el correo: " + dto.correo()
+            );
+        }
 
-        return ClienteMapper.toResponseDto(guardado);
+        Cliente cliente = mapper.toEntity(dto);
+        Cliente nuevoCliente = repository.save(cliente);
+
+        return mapper.toDto(nuevoCliente);
     }
 
     @Override
     public List<ClienteResponseDto> listar() {
-        return repository.findAll()
-            .stream()
-            .map(ClienteMapper::toResponseDto)
-            .toList();
+        return mapper.toDtoList(repository.findAll());
     }
 
     @Override
     public ClienteResponseDto buscarPorId(Long id) {
         return repository.findById(id)
-            .map(ClienteMapper::toResponseDto)
+            .map(mapper::toDto)
             .orElseThrow(() -> new RecursoNoEncontradoException(
                 "No se encontró el id: " + id
             ));
     }
 
     @Override
+    @Transactional
     public ClienteResponseDto actualizar(Long id, ClienteRequestDto dto) {
-        Cliente cliente = repository.findById(id)
+        Cliente existeCliente = repository.findById(id)
             .orElseThrow(() -> new RecursoNoEncontradoException(
-                "No se encontró el id" + id
+                "No se encontró el id: " + id
             ));
 
-        ClienteMapper.updateEntity(cliente,dto);
-        Cliente guardado = repository.save(cliente);
-        return ClienteMapper.toResponseDto(guardado);
+        if (repository.existsByCorreoAndIdClienteNot(dto.correo(), id)) {
+            throw new IllegalArgumentException(
+                "Ya existe un cliente con el correo: " + dto.correo()
+            );
+        }
+
+        mapper.updateEntity(existeCliente,dto);
+        Cliente clienteActualizado = repository.save(existeCliente);
+        return mapper.toDto(clienteActualizado);
     }
 
     @Override
+    @Transactional
     public void eliminar(Long id) {
         Cliente cliente = repository.findById(id)
             .orElseThrow(() -> new RecursoNoEncontradoException(
-                "No se encontró el id" + id
+                "No se encontró el id: " + id
             ));
 
         repository.delete(cliente);

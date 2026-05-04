@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DetalleVenta {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idDetalleVenta;
 
     @Column(nullable = false)
@@ -24,11 +24,11 @@ public class DetalleVenta {
     @Column(nullable = false)
     private Double subtotal;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_venta")
     private Venta venta;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "id_producto")
     private Producto producto;
 }

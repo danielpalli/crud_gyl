@@ -1,6 +1,8 @@
 package com.gyl.CrudGyL.entity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Venta {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idVenta;
 
     @Column(nullable = false)
@@ -23,7 +25,10 @@ public class Venta {
     @Column(nullable = false)
     private Double total;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cliente")
     private Cliente cliente;
+
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetalleVenta> detalles = new ArrayList<>();
 }
