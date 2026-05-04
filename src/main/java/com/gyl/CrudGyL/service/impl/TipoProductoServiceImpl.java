@@ -3,7 +3,8 @@ package com.gyl.CrudGyL.service.impl;
 import com.gyl.CrudGyL.dto.request.TipoProductoRequestDto;
 import com.gyl.CrudGyL.dto.response.TipoProductoResponseDto;
 import com.gyl.CrudGyL.entity.TipoProducto;
-import com.gyl.CrudGyL.exception.RecursoNoEncontradoException;
+import com.gyl.CrudGyL.exception.ConflictException;
+import com.gyl.CrudGyL.exception.ResourceNotFoundException;
 import com.gyl.CrudGyL.mapper.TipoProductoMapper;
 import com.gyl.CrudGyL.repository.TipoProductoRepository;
 import com.gyl.CrudGyL.service.TipoProductoService;
@@ -25,7 +26,7 @@ public class TipoProductoServiceImpl implements TipoProductoService {
     @Transactional
     public TipoProductoResponseDto crear(TipoProductoRequestDto dto) {
         if (repository.existsByNombre(dto.nombre())) {
-            throw new IllegalArgumentException("Ya existe un tipo de producto con el nombre: " + dto.nombre());
+            throw new ConflictException("Ya existe un tipo de producto con el nombre: " + dto.nombre());
         }
 
         TipoProducto tipoProducto = mapper.toEntity(dto);
@@ -42,7 +43,7 @@ public class TipoProductoServiceImpl implements TipoProductoService {
     public TipoProductoResponseDto buscarPorId(Long id) {
         return repository.findById(id)
             .map(mapper::toDto)
-            .orElseThrow(() -> new RecursoNoEncontradoException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "No se encontró el tipo de producto con id: " + id
             ));
     }
@@ -51,12 +52,12 @@ public class TipoProductoServiceImpl implements TipoProductoService {
     @Transactional
     public TipoProductoResponseDto actualizar(Long id, TipoProductoRequestDto dto) {
         TipoProducto tipoProducto = repository.findById(id)
-            .orElseThrow(() -> new RecursoNoEncontradoException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "No se encontró el tipo de producto con id: " + id
             ));
 
         if (repository.existsByNombreAndIdTipoProductoNot(dto.nombre(), id)) {
-            throw new IllegalArgumentException("Ya existe un tipo de producto con el nombre: " + dto.nombre());
+            throw new ConflictException("Ya existe un tipo de producto con el nombre: " + dto.nombre());
         }
 
         mapper.updateEntity(tipoProducto, dto);
@@ -68,7 +69,7 @@ public class TipoProductoServiceImpl implements TipoProductoService {
     @Transactional
     public void eliminar(Long id) {
         TipoProducto tipoProducto = repository.findById(id)
-            .orElseThrow(() -> new RecursoNoEncontradoException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "No se encontró el tipo de producto con id: " + id
             ));
 

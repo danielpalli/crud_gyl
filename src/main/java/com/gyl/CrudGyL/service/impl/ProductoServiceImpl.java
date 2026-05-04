@@ -4,7 +4,8 @@ import com.gyl.CrudGyL.dto.request.ProductoRequestDto;
 import com.gyl.CrudGyL.dto.response.ProductoResponseDto;
 import com.gyl.CrudGyL.entity.Producto;
 import com.gyl.CrudGyL.entity.TipoProducto;
-import com.gyl.CrudGyL.exception.RecursoNoEncontradoException;
+import com.gyl.CrudGyL.exception.ConflictException;
+import com.gyl.CrudGyL.exception.ResourceNotFoundException;
 import com.gyl.CrudGyL.mapper.ProductoMapper;
 import com.gyl.CrudGyL.repository.ProductoRepository;
 import com.gyl.CrudGyL.repository.TipoProductoRepository;
@@ -25,7 +26,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     private TipoProducto resolverTipoProducto(Long idTipoProducto) {
         return tipoProductoRepository.findById(idTipoProducto)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "No se encontró el tipo de producto con id: " + idTipoProducto));
     }
 
@@ -33,7 +34,7 @@ public class ProductoServiceImpl implements ProductoService {
     @Transactional
     public ProductoResponseDto crear(ProductoRequestDto dto) {
         if (repository.existsByNombre(dto.nombre())) {
-            throw new IllegalArgumentException("Ya existe un producto con el nombre: " + dto.nombre());
+            throw new ConflictException("Ya existe un producto con el nombre: " + dto.nombre());
         }
 
         Producto producto = mapper.toEntity(dto);
@@ -51,7 +52,7 @@ public class ProductoServiceImpl implements ProductoService {
     public ProductoResponseDto buscarPorId(Long id) {
         return repository.findById(id)
                 .map(mapper::toDto)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "No se encontró el id: " + id));
     }
 
@@ -64,11 +65,11 @@ public class ProductoServiceImpl implements ProductoService {
     @Transactional
     public ProductoResponseDto actualizar(Long id, ProductoRequestDto dto) {
         Producto producto = repository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "No se encontró el id: " + id));
 
         if (repository.existsByNombreAndIdProductoNot(dto.nombre(), id)) {
-            throw new IllegalArgumentException("Ya existe un producto con el nombre: " + dto.nombre());
+            throw new ConflictException("Ya existe un producto con el nombre: " + dto.nombre());
         }
 
         mapper.updateEntity(producto, dto);
@@ -82,7 +83,7 @@ public class ProductoServiceImpl implements ProductoService {
     @Transactional
     public void eliminar(Long id) {
         Producto producto = repository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "No se encontró el id: " + id));
 
         repository.delete(producto);
