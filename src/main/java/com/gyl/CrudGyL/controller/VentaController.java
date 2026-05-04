@@ -4,7 +4,6 @@ import com.gyl.CrudGyL.dto.request.VentaRequestDto;
 import com.gyl.CrudGyL.dto.response.VentaResponseDto;
 import com.gyl.CrudGyL.service.VentaService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +42,7 @@ public class VentaController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void eliminar(@PathVariable Long id) {
         ventaService.eliminar(id);
     }

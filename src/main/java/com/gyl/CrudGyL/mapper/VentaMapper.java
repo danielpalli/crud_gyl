@@ -1,6 +1,5 @@
 package com.gyl.CrudGyL.mapper;
 
-import com.gyl.CrudGyL.dto.request.DetalleVentaRequestDto;
 import com.gyl.CrudGyL.dto.request.VentaRequestDto;
 import com.gyl.CrudGyL.dto.response.DetalleVentaResponseDto;
 import com.gyl.CrudGyL.dto.response.VentaResponseDto;
@@ -21,18 +20,25 @@ public interface VentaMapper {
     @Mapping(source = "cliente", target = "nombreCliente", qualifiedByName = "combinarNombres")
     VentaResponseDto toDto(Venta entity);
 
+    List<VentaResponseDto> toDtoList(List<Venta> listEntity);
+
     @Mapping(source = "producto.idProducto", target = "idProducto")
     @Mapping(source = "producto.nombre", target = "nombreProducto")
     DetalleVentaResponseDto toDetalleDto(DetalleVenta detalleEntity);
 
-    List<DetalleVentaResponseDto> toDtoList(List<DetalleVenta> listEntity);
+    List<DetalleVentaResponseDto> toDetalleDtoList(List<DetalleVenta> listEntity);
 
-    @Mapping(source = "idCliente", target = "cliente.idCliente")
+    @Mapping(target = "idVenta", ignore = true)
+    @Mapping(target = "fechaVenta", ignore = true)
+    @Mapping(target = "total", ignore = true)
+    @Mapping(target = "cliente", ignore = true)
+    @Mapping(target = "detalles", ignore = true)
     void updateEntity(@MappingTarget Venta venta, VentaRequestDto dto);
 
     @Named("combinarNombres")
     default String combinar(Cliente cliente) {
-        if (cliente == null) return "";
+        if (cliente == null)
+            return "";
         return String.format("%s %s", cliente.getNombre(), cliente.getApellido());
     }
 }
