@@ -6,7 +6,8 @@ import com.gyl.CrudGyL.entity.Cliente;
 import com.gyl.CrudGyL.entity.DetalleVenta;
 import com.gyl.CrudGyL.entity.Producto;
 import com.gyl.CrudGyL.entity.Venta;
-import com.gyl.CrudGyL.exception.RecursoNoEncontradoException;
+import com.gyl.CrudGyL.exception.BadRequestException;
+import com.gyl.CrudGyL.exception.ResourceNotFoundException;
 import com.gyl.CrudGyL.mapper.VentaMapper;
 import com.gyl.CrudGyL.repository.ClienteRepository;
 import com.gyl.CrudGyL.repository.ProductoRepository;
@@ -32,7 +33,7 @@ public class VentaServiceImpl implements VentaService {
     @Transactional
     public VentaResponseDto crear(VentaRequestDto dto) {
         Cliente cliente = clienteRepository.findById(dto.idCliente())
-            .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el cliente con id: " + dto.idCliente()));
+            .orElseThrow(() -> new ResourceNotFoundException("No se encontró el cliente con id: " + dto.idCliente()));
 
         Venta venta = new Venta();
         venta.setFechaVenta(LocalDate.now());
@@ -56,7 +57,7 @@ public class VentaServiceImpl implements VentaService {
     public VentaResponseDto buscarPorId(Long id) {
         return repository.findById(id)
             .map(mapper::toDto)
-            .orElseThrow(() -> new RecursoNoEncontradoException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "No se encontró el id: " + id
             ));
     }
@@ -65,20 +66,17 @@ public class VentaServiceImpl implements VentaService {
     @Transactional
     public VentaResponseDto actualizar(Long id, VentaRequestDto dto) {
         Venta venta = repository.findById(id)
-            .orElseThrow(() -> new RecursoNoEncontradoException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "No se encontró el id: " + id
             ));
 
         Cliente cliente = clienteRepository.findById(dto.idCliente())
-            .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el cliente con id: " + dto.idCliente()));
+            .orElseThrow(() -> new ResourceNotFoundException("No se encontró el cliente con id: " + dto.idCliente()));
 
-        // Restaurar stock de los detalles anteriores
         restaurarStock(venta.getDetalles());
 
-        // Limpiar detalles anteriores
         venta.getDetalles().clear();
 
-        // Procesar nuevos detalles
         List<DetalleVenta> nuevosDetalles = procesarDetalles(dto, venta);
 
         venta.setCliente(cliente);
@@ -93,11 +91,10 @@ public class VentaServiceImpl implements VentaService {
     @Transactional
     public void eliminar(Long id) {
         Venta venta = repository.findById(id)
-            .orElseThrow(() -> new RecursoNoEncontradoException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "No se encontró el id: " + id
             ));
 
-        // Restaurar stock antes de eliminar
         restaurarStock(venta.getDetalles());
 
         repository.delete(venta);
@@ -107,17 +104,15 @@ public class VentaServiceImpl implements VentaService {
         return dto.detalles().stream()
             .map(detalleDto -> {
                 Producto producto = productoRepository.findById(detalleDto.idProducto())
-                    .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado con id: " + detalleDto.idProducto()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + detalleDto.idProducto()));
 
                 if (producto.getStock() < detalleDto.cantidad()) {
-                    throw new IllegalArgumentException("Stock insuficiente para el producto: " + producto.getNombre());
+                    throw new BadRequestException("Stock insuficiente para el producto: " + producto.getNombre());
                 }
 
-                // Descontar stock
                 producto.setStock(producto.getStock() - detalleDto.cantidad());
                 productoRepository.save(producto);
 
-                // Crear detalle
                 DetalleVenta detalle = new DetalleVenta();
                 detalle.setProducto(producto);
                 detalle.setCantidad(detalleDto.cantidad());
