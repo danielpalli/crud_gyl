@@ -9,7 +9,7 @@ public record ClienteRequestDto(
     @NotBlank(message = "El nombre no puede estar vacío")
     String nombre,
 
-    @NotBlank(message = "El nombre no puede estar vacío")
+    @NotBlank(message = "El apellido no puede estar vacío")
     String apellido,
 
     @NotBlank(message = "El correo electrónico no puede estar vacío")

@@ -30,9 +30,9 @@ public class ClienteServiceImpl implements ClienteService {
         }
 
         Cliente cliente = mapper.toEntity(dto);
-        Cliente guardado = repository.save(cliente);
+        Cliente nuevoCliente = repository.save(cliente);
 
-        return mapper.toDto(guardado);
+        return mapper.toDto(nuevoCliente);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class ClienteServiceImpl implements ClienteService {
     public ClienteResponseDto actualizar(Long id, ClienteRequestDto dto) {
         Cliente existeCliente = repository.findById(id)
             .orElseThrow(() -> new RecursoNoEncontradoException(
-                "No se encontró el id" + id
+                "No se encontró el id: " + id
             ));
 
         if (repository.existsByCorreoAndIdClienteNot(dto.correo(), id)) {

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class Cliente {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idCliente;
 
     @Column(nullable = false, length = 50)
