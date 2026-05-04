@@ -5,9 +5,9 @@ import java.util.List;
 
 public record VentaResponseDto(
     Long idVenta,
+    Long idCliente,
     LocalDate fechaVenta,
     Double total,
-    Long idCliente,
     String nombreCliente,
     List<DetalleVentaResponseDto> detalles
 ) {
