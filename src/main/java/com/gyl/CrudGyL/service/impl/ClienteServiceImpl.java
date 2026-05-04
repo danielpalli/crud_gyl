@@ -3,7 +3,8 @@ package com.gyl.CrudGyL.service.impl;
 import com.gyl.CrudGyL.dto.request.ClienteRequestDto;
 import com.gyl.CrudGyL.dto.response.ClienteResponseDto;
 import com.gyl.CrudGyL.entity.Cliente;
-import com.gyl.CrudGyL.exception.RecursoNoEncontradoException;
+import com.gyl.CrudGyL.exception.ConflictException;
+import com.gyl.CrudGyL.exception.ResourceNotFoundException;
 import com.gyl.CrudGyL.mapper.ClienteMapper;
 import com.gyl.CrudGyL.repository.ClienteRepository;
 import com.gyl.CrudGyL.service.ClienteService;
@@ -24,7 +25,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Transactional
     public ClienteResponseDto crear(ClienteRequestDto dto) {
         if (repository.existsByCorreo(dto.correo())) {
-            throw new IllegalArgumentException(
+            throw new ConflictException(
                 "Ya existe un cliente con el correo: " + dto.correo()
             );
         }
@@ -44,7 +45,7 @@ public class ClienteServiceImpl implements ClienteService {
     public ClienteResponseDto buscarPorId(Long id) {
         return repository.findById(id)
             .map(mapper::toDto)
-            .orElseThrow(() -> new RecursoNoEncontradoException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "No se encontró el id: " + id
             ));
     }
@@ -53,12 +54,12 @@ public class ClienteServiceImpl implements ClienteService {
     @Transactional
     public ClienteResponseDto actualizar(Long id, ClienteRequestDto dto) {
         Cliente existeCliente = repository.findById(id)
-            .orElseThrow(() -> new RecursoNoEncontradoException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "No se encontró el id: " + id
             ));
 
         if (repository.existsByCorreoAndIdClienteNot(dto.correo(), id)) {
-            throw new IllegalArgumentException(
+            throw new ConflictException(
                 "Ya existe un cliente con el correo: " + dto.correo()
             );
         }
@@ -72,7 +73,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Transactional
     public void eliminar(Long id) {
         Cliente cliente = repository.findById(id)
-            .orElseThrow(() -> new RecursoNoEncontradoException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "No se encontró el id: " + id
             ));
 
