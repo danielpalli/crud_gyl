@@ -3,30 +3,24 @@ package com.gyl.CrudGyL.mapper;
 import com.gyl.CrudGyL.dto.request.ProductoRequestDto;
 import com.gyl.CrudGyL.entity.Producto;
 import com.gyl.CrudGyL.dto.response.ProductoResponseDto;
+import com.gyl.CrudGyL.mapper.config.GlobalMapperConfig;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
-public class ProductoMapper {
-    private ProductoMapper() {}
+import java.util.List;
 
-    public static Producto toEntity(ProductoRequestDto dto){
-        Producto producto = new Producto();
-        producto.setNombre(dto.nombre());
-        producto.setPrecio(dto.precio());
-        producto.setStock(dto.stock());
-        return producto;
-    }
+@Mapper(config = GlobalMapperConfig.class)
+public interface ProductoMapper {
+    @Mapping(source = "idTipoProducto", target = "tipoProducto.idTipoProducto")
+    Producto toEntity(ProductoRequestDto dto);
 
-    public static ProductoResponseDto toResponseDto(Producto producto){
-        return new ProductoResponseDto(
-            producto.getIdProducto(),
-            producto.getNombre(),
-            producto.getPrecio(),
-            producto.getStock()
-        );
-    }
+    @Mapping(source = "tipoProducto.idTipoProducto", target = "idTipoProducto")
+    @Mapping(source = "tipoProducto.nombre", target = "nombreTipoProducto")
+    ProductoResponseDto toDto(Producto entity);
 
-    public static void updateEntity(Producto producto, ProductoRequestDto dto){
-        producto.setNombre(dto.nombre());
-        producto.setPrecio(dto.precio());
-        producto.setStock(dto.stock());
-    }
+    List<ProductoResponseDto> toDtoList(List<Producto> listEntity);
+
+    @Mapping(source = "idTipoProducto", target = "tipoProducto.idTipoProducto")
+    void updateEntity(@MappingTarget Producto entity, ProductoRequestDto dto);
 }

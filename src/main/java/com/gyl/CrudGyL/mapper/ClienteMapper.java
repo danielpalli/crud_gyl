@@ -3,37 +3,16 @@ package com.gyl.CrudGyL.mapper;
 import com.gyl.CrudGyL.dto.request.ClienteRequestDto;
 import com.gyl.CrudGyL.dto.response.ClienteResponseDto;
 import com.gyl.CrudGyL.entity.Cliente;
+import com.gyl.CrudGyL.mapper.config.GlobalMapperConfig;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 
-public class ClienteMapper {
+import java.util.List;
 
-    private ClienteMapper() {
-    }
-
-    public static Cliente toEntity(ClienteRequestDto dto) {
-        Cliente cliente = new Cliente();
-        cliente.setNombre(dto.nombre());
-        cliente.setApellido(dto.apellido());
-        cliente.setCorreo(dto.correo());
-        cliente.setDireccion(dto.direccion());
-        cliente.setTelefono(dto.telefono());
-        return cliente;
-    }
-
-    public static ClienteResponseDto toResponseDto(Cliente cliente) {
-        return new ClienteResponseDto(
-                cliente.getIdCliente(),
-                cliente.getNombre(),
-                cliente.getApellido(),
-                cliente.getCorreo(),
-                cliente.getDireccion(),
-                cliente.getTelefono());
-    }
-
-    public static void updateEntity(Cliente cliente, ClienteRequestDto dto) {
-        cliente.setNombre(dto.nombre());
-        cliente.setApellido(dto.apellido());
-        cliente.setCorreo(dto.correo());
-        cliente.setDireccion(dto.direccion());
-        cliente.setTelefono(dto.telefono());
-    }
+@Mapper(config = GlobalMapperConfig.class)
+public interface ClienteMapper {
+    Cliente toEntity(ClienteRequestDto dto);
+    ClienteResponseDto toDto(Cliente entity);
+    List<ClienteResponseDto> toDtoList(List<Cliente> listEntity);
+    void updateEntity(@MappingTarget Cliente entity, ClienteRequestDto dto);
 }
