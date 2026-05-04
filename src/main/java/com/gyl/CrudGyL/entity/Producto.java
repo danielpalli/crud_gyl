@@ -5,7 +5,8 @@ import lombok.*;
 
 @Entity
 @Table(name="productos")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Producto {
@@ -22,7 +23,7 @@ public class Producto {
     @Column(nullable = false)
     private Integer stock;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_producto")
     private TipoProducto tipoProducto;
 }

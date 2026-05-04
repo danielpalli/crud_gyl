@@ -1,13 +1,12 @@
 package com.gyl.CrudGyL.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name="tipo_producto")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class TipoProducto {
@@ -20,5 +19,4 @@ public class TipoProducto {
 
     @Column(nullable = false, length = 100)
     private String descripcion;
-
 }

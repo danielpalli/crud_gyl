@@ -1,13 +1,12 @@
 package com.gyl.CrudGyL.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "detalle_venta")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class DetalleVenta {
@@ -24,11 +23,11 @@ public class DetalleVenta {
     @Column(nullable = false)
     private Double subtotal;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_venta")
     private Venta venta;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "id_producto")
     private Producto producto;
 }
