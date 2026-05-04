@@ -10,7 +10,7 @@ import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
-@Mapper(config = Glob alMapperConfig.class)
+@Mapper(config = GlobalMapperConfig.class)
 public interface ClienteMapper {
     @Mapping(target = "idCliente", ignore = true)
     Cliente toEntity(ClienteRequestDto dto);
