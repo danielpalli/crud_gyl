@@ -114,6 +114,11 @@ public class VentaServiceImpl implements VentaService {
                 "No se encontró el id: " + id
             ));
 
+        venta.getDetalles().forEach(detalle -> {
+            Producto producto = detalle.getProducto();
+            producto.setStock(producto.getStock() + detalle.getCantidad());
+        });
+
         repository.delete(venta);
     }
 

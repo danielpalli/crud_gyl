@@ -24,15 +24,8 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional
     public ClienteResponseDto crear(ClienteRequestDto dto) {
-        if (repository.existsByCorreo(dto.correo())) {
-            throw new ConflictException(
-                "Ya existe un cliente con el correo: " + dto.correo()
-            );
-        }
-
         Cliente cliente = mapper.toEntity(dto);
         Cliente nuevoCliente = repository.save(cliente);
-
         return mapper.toDto(nuevoCliente);
     }
 
@@ -58,15 +51,8 @@ public class ClienteServiceImpl implements ClienteService {
                 "No se encontró el id: " + id
             ));
 
-        if (repository.existsByCorreoAndIdClienteNot(dto.correo(), id)) {
-            throw new ConflictException(
-                "Ya existe un cliente con el correo: " + dto.correo()
-            );
-        }
-
         mapper.updateEntity(existeCliente,dto);
-        Cliente clienteActualizado = repository.save(existeCliente);
-        return mapper.toDto(clienteActualizado);
+        return mapper.toDto(existeCliente);
     }
 
     @Override
