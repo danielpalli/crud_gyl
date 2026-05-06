@@ -14,8 +14,11 @@ import java.util.List;
 public interface TipoProductoMapper {
     @Mapping(target = "idTipoProducto", ignore = true)
     TipoProducto toEntity(TipoProductoRequestDto dto);
+
     TipoProductoResponseDto toDto(TipoProducto entity);
+
     List<TipoProductoResponseDto> toDtoList(List<TipoProducto> listEntity);
+
     @Mapping(target = "idTipoProducto", ignore = true)
     void updateEntity(@MappingTarget TipoProducto entity, TipoProductoRequestDto dto);
 }

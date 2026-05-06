@@ -14,8 +14,11 @@ import java.util.List;
 public interface ClienteMapper {
     @Mapping(target = "idCliente", ignore = true)
     Cliente toEntity(ClienteRequestDto dto);
+
     ClienteResponseDto toDto(Cliente entity);
+
     List<ClienteResponseDto> toDtoList(List<Cliente> listEntity);
+
     @Mapping(target = "idCliente", ignore = true)
     void updateEntity(@MappingTarget Cliente entity, ClienteRequestDto dto);
 }

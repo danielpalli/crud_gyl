@@ -21,7 +21,7 @@ public interface VentaMapper {
     List<VentaResponseDto> toDtoList(List<Venta> listEntity);
 
     @Mapping(source = "producto.idProducto", target = "idProducto")
-    @Mapping(source = "producto.nombre", target = "nombreProducto")
+    @Mapping(source = "producto.nombreProducto", target = "nombreProducto")
     DetalleVentaResponseDto toDetalleDto(DetalleVenta detalleEntity);
 
     List<DetalleVentaResponseDto> toDetalleDtoList(List<DetalleVenta> listEntity);
