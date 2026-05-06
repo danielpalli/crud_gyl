@@ -16,7 +16,7 @@ public class TipoProducto {
     private Long idTipoProducto;
 
     @Column(nullable = false, unique = true, length = 50)
-    private String nombre;
+    private String nombreTipoProducto;
 
     @Column(nullable = false, length = 100)
     private String descripcion;
