@@ -15,7 +15,7 @@ public record ClienteUpdateRequestDto(
     @Size(max = 150, message = "El correo electrónico no puede tener más de 150 caracteres")
     String correo,
 
-    @Pattern(regexp = "^(\\d{8}\\d{10})$", message = "El teléfono solo deber tener 8 o 10 dígitos numéricos")
+    @Pattern(regexp = "^(\\d{8}|\\d{10})$", message = "El teléfono solo deber tener 8 o 10 dígitos numéricos")
     String telefono,
 
     @Size(max = 150, message = "La dirección no puede tener más de 150 caracteres")

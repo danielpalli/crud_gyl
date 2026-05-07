@@ -20,7 +20,7 @@ public record ClienteRequestDto(
     String correo,
 
     @NotBlank(message = "El teléfono no puede estar vacío")
-    @Pattern(regexp = "^(\\d{8}\\d{10})$", message = "El teléfono solo deber tener 8 o 10 dígitos numéricos")
+    @Pattern(regexp = "^(\\d{8}|\\d{10})$", message = "El teléfono solo deber tener 8 o 10 dígitos numéricos")
     String telefono,
 
     @NotBlank(message = "La dirección no puede estar vacía")
