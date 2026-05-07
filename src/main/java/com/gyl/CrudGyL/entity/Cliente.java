@@ -21,12 +21,12 @@ public class Cliente {
     @Column(nullable = false, length = 50)
     private String apellido;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true, length = 150)
     private String correo;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     private String telefono;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 150)
     private String direccion;
 }

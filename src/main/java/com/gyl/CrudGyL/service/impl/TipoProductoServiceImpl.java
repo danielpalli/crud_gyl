@@ -1,11 +1,13 @@
 package com.gyl.CrudGyL.service.impl;
 
 import com.gyl.CrudGyL.dto.request.TipoProductoRequestDto;
+import com.gyl.CrudGyL.dto.request.update.TipoProductoUpdateRequestDto;
 import com.gyl.CrudGyL.dto.response.TipoProductoResponseDto;
 import com.gyl.CrudGyL.entity.TipoProducto;
 import com.gyl.CrudGyL.exception.ConflictException;
 import com.gyl.CrudGyL.exception.ResourceNotFoundException;
 import com.gyl.CrudGyL.mapper.TipoProductoMapper;
+import com.gyl.CrudGyL.repository.ProductoRepository;
 import com.gyl.CrudGyL.repository.TipoProductoRepository;
 import com.gyl.CrudGyL.service.TipoProductoService;
 import lombok.RequiredArgsConstructor;
@@ -18,15 +20,15 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class TipoProductoServiceImpl implements TipoProductoService {
-
     private final TipoProductoRepository repository;
+    private final ProductoRepository productoRepository;
     private final TipoProductoMapper mapper;
 
     @Override
     @Transactional
     public TipoProductoResponseDto crear(TipoProductoRequestDto dto) {
-        if (repository.existsByNombre(dto.nombre())) {
-            throw new ConflictException("Ya existe un tipo de producto con el nombre: " + dto.nombre());
+        if (repository.existsByNombreTipoProducto(dto.nombreTipoProducto())) {
+            throw new ConflictException("Ya existe un tipo de producto con el nombreProducto: " + dto.nombreTipoProducto());
         }
 
         TipoProducto tipoProducto = mapper.toEntity(dto);
@@ -50,19 +52,18 @@ public class TipoProductoServiceImpl implements TipoProductoService {
 
     @Override
     @Transactional
-    public TipoProductoResponseDto actualizar(Long id, TipoProductoRequestDto dto) {
+    public TipoProductoResponseDto actualizar(Long id, TipoProductoUpdateRequestDto dto) {
         TipoProducto tipoProducto = repository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "No se encontró el tipo de producto con id: " + id
             ));
 
-        if (repository.existsByNombreAndIdTipoProductoNot(dto.nombre(), id)) {
-            throw new ConflictException("Ya existe un tipo de producto con el nombre: " + dto.nombre());
+        if (dto.nombreTipoProducto() != null && repository.existsByNombreTipoProductoAndIdTipoProductoNot(dto.nombreTipoProducto(), id)) {
+            throw new ConflictException("Ya existe un tipo de producto con el nombreProducto: " + dto.nombreTipoProducto());
         }
 
         mapper.updateEntity(tipoProducto, dto);
-        TipoProducto productoActualizado = repository.save(tipoProducto);
-        return mapper.toDto(productoActualizado);
+        return mapper.toDto(tipoProducto);
     }
 
     @Override
@@ -72,6 +73,10 @@ public class TipoProductoServiceImpl implements TipoProductoService {
             .orElseThrow(() -> new ResourceNotFoundException(
                 "No se encontró el tipo de producto con id: " + id
             ));
+
+        if (productoRepository.existsByTipoProductoIdTipoProducto(id)) {
+            throw new ConflictException("No se puede eliminar el tipo de producto porque tiene prductos asociados.");
+        }
 
         repository.delete(tipoProducto);
     }

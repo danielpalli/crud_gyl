@@ -15,8 +15,8 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idProducto;
 
-    @Column(nullable = false, length = 100)
-    private String nombre;
+    @Column(nullable = false, unique = true, length = 100)
+    private String nombreProducto;
 
     @Column(nullable = false)
     private Double precio;
@@ -25,6 +25,6 @@ public class Producto {
     private Integer stock;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_tipo_producto")
+    @JoinColumn(name = "id_tipo_producto", nullable = false)
     private TipoProducto tipoProducto;
 }

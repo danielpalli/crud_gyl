@@ -1,6 +1,7 @@
 package com.gyl.CrudGyL.service;
 
 import com.gyl.CrudGyL.dto.request.TipoProductoRequestDto;
+import com.gyl.CrudGyL.dto.request.update.TipoProductoUpdateRequestDto;
 import com.gyl.CrudGyL.dto.response.TipoProductoResponseDto;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public interface TipoProductoService {
 
     TipoProductoResponseDto buscarPorId(Long id);
 
-    TipoProductoResponseDto actualizar(Long id, TipoProductoRequestDto dto);
+    TipoProductoResponseDto actualizar(Long id, TipoProductoUpdateRequestDto dto);
 
     void eliminar(Long id);
 }
