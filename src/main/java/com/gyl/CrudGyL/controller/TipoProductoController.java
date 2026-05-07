@@ -1,6 +1,7 @@
 package com.gyl.CrudGyL.controller;
 
 import com.gyl.CrudGyL.dto.request.TipoProductoRequestDto;
+import com.gyl.CrudGyL.dto.request.update.TipoProductoUpdateRequestDto;
 import com.gyl.CrudGyL.dto.response.TipoProductoResponseDto;
 import com.gyl.CrudGyL.service.TipoProductoService;
 import jakarta.validation.Valid;
@@ -35,9 +36,9 @@ public class TipoProductoController {
         return tipoProductoService.buscarPorId(id);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public TipoProductoResponseDto actualizar(@PathVariable Long id, @Valid @RequestBody TipoProductoRequestDto dto) {
+    public TipoProductoResponseDto actualizar(@PathVariable Long id, @Valid @RequestBody TipoProductoUpdateRequestDto dto) {
         return tipoProductoService.actualizar(id, dto);
     }
 

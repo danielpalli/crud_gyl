@@ -35,7 +35,7 @@ public class VentaController {
         return ventaService.buscarPorId(id);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public VentaResponseDto actualizar(@PathVariable Long id, @Valid @RequestBody VentaRequestDto dto) {
         return ventaService.actualizar(id, dto);

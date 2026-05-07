@@ -1,6 +1,7 @@
 package com.gyl.CrudGyL.controller;
 
 import com.gyl.CrudGyL.dto.request.ClienteRequestDto;
+import com.gyl.CrudGyL.dto.request.update.ClienteUpdateRequestDto;
 import com.gyl.CrudGyL.dto.response.ClienteResponseDto;
 import com.gyl.CrudGyL.service.ClienteService;
 
@@ -35,9 +36,9 @@ public class ClienteController {
         return clienteService.buscarPorId(id);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ClienteResponseDto actualizar(@PathVariable Long id, @Valid @RequestBody ClienteRequestDto dto) {
+    public ClienteResponseDto actualizar(@PathVariable Long id, @Valid @RequestBody ClienteUpdateRequestDto dto) {
         return  clienteService.actualizar(id, dto);
     }
 
