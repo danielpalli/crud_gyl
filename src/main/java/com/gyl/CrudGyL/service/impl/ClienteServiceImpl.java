@@ -1,6 +1,7 @@
 package com.gyl.CrudGyL.service.impl;
 
 import com.gyl.CrudGyL.dto.request.ClienteRequestDto;
+import com.gyl.CrudGyL.dto.request.update.ClienteUpdateRequestDto;
 import com.gyl.CrudGyL.dto.response.ClienteResponseDto;
 import com.gyl.CrudGyL.entity.Cliente;
 import com.gyl.CrudGyL.exception.ConflictException;
@@ -24,6 +25,10 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional
     public ClienteResponseDto crear(ClienteRequestDto dto) {
+        if (repository.existsByCorreo(dto.correo())) {
+            throw new ConflictException("Ya existe un cliente con el correo: " + dto.correo());
+        }
+
         Cliente cliente = mapper.toEntity(dto);
         Cliente nuevoCliente = repository.save(cliente);
         return mapper.toDto(nuevoCliente);
@@ -45,11 +50,15 @@ public class ClienteServiceImpl implements ClienteService {
 
     @Override
     @Transactional
-    public ClienteResponseDto actualizar(Long id, ClienteRequestDto dto) {
+    public ClienteResponseDto actualizar(Long id, ClienteUpdateRequestDto dto) {
         Cliente existeCliente = repository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "No se encontró el id: " + id
             ));
+
+        if (dto.correo() != null && repository.existsByCorreoAndIdClienteNot(dto.correo(), id)) {
+            throw new ConflictException("Ya existe un cliente con el correo: " + dto.correo());
+        }
 
         mapper.updateEntity(existeCliente,dto);
         return mapper.toDto(existeCliente);

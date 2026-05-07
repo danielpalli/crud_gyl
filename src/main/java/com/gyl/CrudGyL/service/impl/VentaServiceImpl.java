@@ -53,7 +53,7 @@ public class VentaServiceImpl implements VentaService {
             }).toList();
 
         venta.setDetalles(detalles);
-
+        venta.setTotal(calcularTotal(detalles));
         Venta nuevaVenta = repository.save(venta);
         return mapper.toDto(nuevaVenta);
     }
@@ -101,6 +101,7 @@ public class VentaServiceImpl implements VentaService {
 
         venta.setCliente(cliente);
         venta.getDetalles().addAll(nuevosDetalles);
+        venta.setTotal(calcularTotal(nuevosDetalles));
 
         Venta ventaActualizada = repository.save(venta);
         return mapper.toDto(ventaActualizada);
@@ -122,4 +123,9 @@ public class VentaServiceImpl implements VentaService {
         repository.delete(venta);
     }
 
+    private Double calcularTotal(List<DetalleVenta> detalles) {
+        return detalles.stream()
+            .mapToDouble(DetalleVenta::getSubtotal)
+            .sum();
+    }
 }

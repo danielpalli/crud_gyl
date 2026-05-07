@@ -1,6 +1,7 @@
 package com.gyl.CrudGyL.service.impl;
 
 import com.gyl.CrudGyL.dto.request.TipoProductoRequestDto;
+import com.gyl.CrudGyL.dto.request.update.TipoProductoUpdateRequestDto;
 import com.gyl.CrudGyL.dto.response.TipoProductoResponseDto;
 import com.gyl.CrudGyL.entity.TipoProducto;
 import com.gyl.CrudGyL.exception.ConflictException;
@@ -51,7 +52,7 @@ public class TipoProductoServiceImpl implements TipoProductoService {
 
     @Override
     @Transactional
-    public TipoProductoResponseDto actualizar(Long id, TipoProductoRequestDto dto) {
+    public TipoProductoResponseDto actualizar(Long id, TipoProductoUpdateRequestDto dto) {
         TipoProducto tipoProducto = repository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "No se encontró el tipo de producto con id: " + id

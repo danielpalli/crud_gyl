@@ -1,6 +1,7 @@
 package com.gyl.CrudGyL.service.impl;
 
 import com.gyl.CrudGyL.dto.request.ProductoRequestDto;
+import com.gyl.CrudGyL.dto.request.update.ProductoUpdateRequestDto;
 import com.gyl.CrudGyL.dto.response.ProductoResponseDto;
 import com.gyl.CrudGyL.entity.Producto;
 import com.gyl.CrudGyL.entity.TipoProducto;
@@ -57,7 +58,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional
-    public ProductoResponseDto actualizar(Long id, ProductoRequestDto dto) {
+    public ProductoResponseDto actualizar(Long id, ProductoUpdateRequestDto dto) {
         Producto producto = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No se encontró el id: " + id));
