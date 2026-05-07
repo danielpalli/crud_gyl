@@ -21,7 +21,7 @@ public class Cliente {
     @Column(nullable = false, length = 50)
     private String apellido;
 
-    @Column(nullable = false, length = 150)
+    @Column(nullable = false, unique = true, length = 150)
     private String correo;
 
     @Column(nullable = false, length = 10)
