@@ -1,6 +1,7 @@
 package com.gyl.CrudGyL.mapper;
 
 import com.gyl.CrudGyL.dto.request.ClienteRequestDto;
+import com.gyl.CrudGyL.dto.request.update.ClienteUpdateRequestDto;
 import com.gyl.CrudGyL.dto.response.ClienteResponseDto;
 import com.gyl.CrudGyL.entity.Cliente;
 import com.gyl.CrudGyL.mapper.config.GlobalMapperConfig;
@@ -20,5 +21,5 @@ public interface ClienteMapper {
     List<ClienteResponseDto> toDtoList(List<Cliente> listEntity);
 
     @Mapping(target = "idCliente", ignore = true)
-    void updateEntity(@MappingTarget Cliente entity, ClienteRequestDto dto);
+    void updateEntity(@MappingTarget Cliente entity, ClienteUpdateRequestDto dto);
 }
