@@ -1,6 +1,7 @@
 package com.gyl.CrudGyL.controller;
 
 import com.gyl.CrudGyL.dto.request.ProductoRequestDto;
+import com.gyl.CrudGyL.dto.request.update.ProductoUpdateRequestDto;
 import com.gyl.CrudGyL.dto.response.ProductoResponseDto;
 import com.gyl.CrudGyL.service.ProductoService;
 import jakarta.validation.Valid;
@@ -40,9 +41,9 @@ public class ProductoController {
         return productoService.buscarPorNombre(nombre);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ProductoResponseDto actualizar(@PathVariable Long id, @Valid @RequestBody ProductoRequestDto dto) {
+    public ProductoResponseDto actualizar(@PathVariable Long id, @Valid @RequestBody ProductoUpdateRequestDto dto) {
         return productoService.actualizar(id, dto);
     }
 

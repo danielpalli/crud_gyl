@@ -1,6 +1,7 @@
 package com.gyl.CrudGyL.service.impl;
 
 import com.gyl.CrudGyL.dto.request.ProductoRequestDto;
+import com.gyl.CrudGyL.dto.request.update.ProductoUpdateRequestDto;
 import com.gyl.CrudGyL.dto.response.ProductoResponseDto;
 import com.gyl.CrudGyL.entity.Producto;
 import com.gyl.CrudGyL.entity.TipoProducto;
@@ -24,21 +25,15 @@ public class ProductoServiceImpl implements ProductoService {
     private final TipoProductoRepository tipoProductoRepository;
     private final ProductoMapper mapper;
 
-    private TipoProducto resolverTipoProducto(Long idTipoProducto) {
-        return tipoProductoRepository.findById(idTipoProducto)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "No se encontró el tipo de producto con id: " + idTipoProducto));
-    }
-
     @Override
     @Transactional
     public ProductoResponseDto crear(ProductoRequestDto dto) {
-        if (repository.existsByNombre(dto.nombre())) {
-            throw new ConflictException("Ya existe un producto con el nombre: " + dto.nombre());
+        if (repository.existsByNombreProducto(dto.nombreProducto())) {
+            throw new ConflictException("Ya existe un producto con el nombreProducto: " + dto.nombreProducto());
         }
 
         Producto producto = mapper.toEntity(dto);
-        producto.setTipoProducto(resolverTipoProducto(dto.idTipoProducto()));
+        producto.setTipoProducto(buscarTipoProducto(dto.idTipoProducto()));
         Producto nuevoProducto = repository.save(producto);
         return mapper.toDto(nuevoProducto);
     }
@@ -58,25 +53,28 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     public List<ProductoResponseDto> buscarPorNombre(String nombre) {
-        return mapper.toDtoList(repository.findByNombreContainingIgnoreCase(nombre));
+        return mapper.toDtoList(repository.findByNombreProductoContainingIgnoreCase(nombre));
     }
 
     @Override
     @Transactional
-    public ProductoResponseDto actualizar(Long id, ProductoRequestDto dto) {
+    public ProductoResponseDto actualizar(Long id, ProductoUpdateRequestDto dto) {
         Producto producto = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No se encontró el id: " + id));
 
-        if (repository.existsByNombreAndIdProductoNot(dto.nombre(), id)) {
-            throw new ConflictException("Ya existe un producto con el nombre: " + dto.nombre());
+        if (repository.existsByNombreProductoAndIdProductoNot(dto.nombreProducto(), id)) {
+            throw new ConflictException("Ya existe un producto con el nombreProducto: " + dto.nombreProducto());
         }
 
         mapper.updateEntity(producto, dto);
-        producto.setTipoProducto(resolverTipoProducto(dto.idTipoProducto()));
-        Producto productoActualizado = repository.save(producto);
-        return mapper.toDto(productoActualizado);
-
+        if (dto.idTipoProducto() != null){
+            TipoProducto tipoProducto = tipoProductoRepository.findById(dto.idTipoProducto())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "No se encontró el tipo de producto con id: " + dto.idTipoProducto()));
+            producto.setTipoProducto(tipoProducto);
+        }
+        return mapper.toDto(producto);
     }
 
     @Override
@@ -86,6 +84,16 @@ public class ProductoServiceImpl implements ProductoService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No se encontró el id: " + id));
 
+        if (repository.existsInVentas(id)) {
+            throw new ConflictException("No se puede eliminar el producto por que tiene ventas asociadas.");
+        }
         repository.delete(producto);
     }
+
+    private TipoProducto buscarTipoProducto(Long idTipoProducto) {
+        return tipoProductoRepository.findById(idTipoProducto)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "No se encontró el tipo de producto con id: " + idTipoProducto));
+    }
+
 }

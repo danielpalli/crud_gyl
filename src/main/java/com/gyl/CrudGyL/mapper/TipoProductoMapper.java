@@ -1,6 +1,7 @@
 package com.gyl.CrudGyL.mapper;
 
 import com.gyl.CrudGyL.dto.request.TipoProductoRequestDto;
+import com.gyl.CrudGyL.dto.request.update.TipoProductoUpdateRequestDto;
 import com.gyl.CrudGyL.dto.response.TipoProductoResponseDto;
 import com.gyl.CrudGyL.entity.TipoProducto;
 import com.gyl.CrudGyL.mapper.config.GlobalMapperConfig;
@@ -14,8 +15,11 @@ import java.util.List;
 public interface TipoProductoMapper {
     @Mapping(target = "idTipoProducto", ignore = true)
     TipoProducto toEntity(TipoProductoRequestDto dto);
+
     TipoProductoResponseDto toDto(TipoProducto entity);
+
     List<TipoProductoResponseDto> toDtoList(List<TipoProducto> listEntity);
+
     @Mapping(target = "idTipoProducto", ignore = true)
-    void updateEntity(@MappingTarget TipoProducto entity, TipoProductoRequestDto dto);
+    void updateEntity(@MappingTarget TipoProducto entity, TipoProductoUpdateRequestDto dto);
 }

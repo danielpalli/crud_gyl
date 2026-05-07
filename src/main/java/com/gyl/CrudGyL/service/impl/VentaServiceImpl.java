@@ -6,7 +6,6 @@ import com.gyl.CrudGyL.entity.Cliente;
 import com.gyl.CrudGyL.entity.DetalleVenta;
 import com.gyl.CrudGyL.entity.Producto;
 import com.gyl.CrudGyL.entity.Venta;
-import com.gyl.CrudGyL.exception.BadRequestException;
 import com.gyl.CrudGyL.exception.ResourceNotFoundException;
 import com.gyl.CrudGyL.mapper.VentaMapper;
 import com.gyl.CrudGyL.repository.ClienteRepository;
@@ -39,11 +38,22 @@ public class VentaServiceImpl implements VentaService {
         venta.setFechaVenta(LocalDate.now());
         venta.setCliente(cliente);
 
-        List<DetalleVenta> detalles = procesarDetalles(dto, venta);
+        List<DetalleVenta> detalles = dto.detalles().stream()
+            .map(detalleDto -> {
+                Producto producto = productoRepository.findById(detalleDto.idProducto())
+                    .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + detalleDto.idProducto()));
+
+                DetalleVenta detalle = new DetalleVenta();
+                detalle.setProducto(producto);
+                detalle.setCantidad(detalleDto.cantidad());
+                detalle.setPrecioUnitario(producto.getPrecio());
+                detalle.setSubtotal(producto.getPrecio() * detalleDto.cantidad());
+                detalle.setVenta(venta);
+                return detalle;
+            }).toList();
 
         venta.setDetalles(detalles);
         venta.setTotal(calcularTotal(detalles));
-
         Venta nuevaVenta = repository.save(venta);
         return mapper.toDto(nuevaVenta);
     }
@@ -73,11 +83,21 @@ public class VentaServiceImpl implements VentaService {
         Cliente cliente = clienteRepository.findById(dto.idCliente())
             .orElseThrow(() -> new ResourceNotFoundException("No se encontró el cliente con id: " + dto.idCliente()));
 
-        restaurarStock(venta.getDetalles());
-
         venta.getDetalles().clear();
 
-        List<DetalleVenta> nuevosDetalles = procesarDetalles(dto, venta);
+        List<DetalleVenta> nuevosDetalles = dto.detalles().stream()
+            .map(detalleDto -> {
+                Producto producto = productoRepository.findById(detalleDto.idProducto())
+                    .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + detalleDto.idProducto()));
+
+                DetalleVenta detalle = new DetalleVenta();
+                detalle.setProducto(producto);
+                detalle.setCantidad(detalleDto.cantidad());
+                detalle.setPrecioUnitario(producto.getPrecio());
+                detalle.setSubtotal(producto.getPrecio() * detalleDto.cantidad());
+                detalle.setVenta(venta);
+                return detalle;
+            }).toList();
 
         venta.setCliente(cliente);
         venta.getDetalles().addAll(nuevosDetalles);
@@ -95,43 +115,17 @@ public class VentaServiceImpl implements VentaService {
                 "No se encontró el id: " + id
             ));
 
-        restaurarStock(venta.getDetalles());
+        venta.getDetalles().forEach(detalle -> {
+            Producto producto = detalle.getProducto();
+            producto.setStock(producto.getStock() + detalle.getCantidad());
+        });
 
         repository.delete(venta);
     }
 
-    private List<DetalleVenta> procesarDetalles(VentaRequestDto dto, Venta venta) {
-        return dto.detalles().stream()
-            .map(detalleDto -> {
-                Producto producto = productoRepository.findById(detalleDto.idProducto())
-                    .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + detalleDto.idProducto()));
-
-                if (producto.getStock() < detalleDto.cantidad()) {
-                    throw new BadRequestException("Stock insuficiente para el producto: " + producto.getNombre());
-                }
-
-                producto.setStock(producto.getStock() - detalleDto.cantidad());
-                productoRepository.save(producto);
-
-                DetalleVenta detalle = new DetalleVenta();
-                detalle.setProducto(producto);
-                detalle.setCantidad(detalleDto.cantidad());
-                detalle.setPrecioUnitario(producto.getPrecio());
-                detalle.setSubtotal(producto.getPrecio() * detalleDto.cantidad());
-                detalle.setVenta(venta);
-                return detalle;
-            }).toList();
-    }
-
-    private void restaurarStock(List<DetalleVenta> detalles) {
-        detalles.forEach(detalle -> {
-            Producto producto = detalle.getProducto();
-            producto.setStock(producto.getStock() + detalle.getCantidad());
-            productoRepository.save(producto);
-        });
-    }
-
     private Double calcularTotal(List<DetalleVenta> detalles) {
-        return detalles.stream().mapToDouble(DetalleVenta::getSubtotal).sum();
+        return detalles.stream()
+            .mapToDouble(DetalleVenta::getSubtotal)
+            .sum();
     }
 }

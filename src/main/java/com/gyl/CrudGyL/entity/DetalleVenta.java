@@ -28,7 +28,7 @@ public class DetalleVenta {
     @JoinColumn(name = "id_venta")
     private Venta venta;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_producto")
     private Producto producto;
 }
