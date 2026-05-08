@@ -4,7 +4,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
+@Builder
 public record ClienteRequestDto(
     @NotBlank(message = "El nombre no puede estar vacío")
     @Size(max = 50, message = "El nombre no puede tener más de 50 caracteres")
@@ -26,5 +28,4 @@ public record ClienteRequestDto(
     @NotBlank(message = "La dirección no puede estar vacía")
     @Size(max = 150, message = "La dirección no puede tener más de 150 caracteres")
     String direccion
-    ) {
-}
+) {}

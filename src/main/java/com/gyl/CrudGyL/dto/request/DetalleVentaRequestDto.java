@@ -3,7 +3,9 @@ package com.gyl.CrudGyL.dto.request;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.Builder;
 
+@Builder
 public record DetalleVentaRequestDto(
     @NotNull(message = "El idProducto no puede ser nulo")
     @Positive(message = "El idProducto debe ser un número positivo")

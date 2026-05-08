@@ -3,7 +3,9 @@ package com.gyl.CrudGyL.dto.request.update;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
+@Builder
 public record ClienteUpdateRequestDto(
     @Size(max = 50, message = "El nombre no puede tener más de 50 caracteres")
     String nombre,
@@ -20,4 +22,4 @@ public record ClienteUpdateRequestDto(
 
     @Size(max = 150, message = "La dirección no puede tener más de 150 caracteres")
     String direccion
-){}
+) {}

@@ -2,7 +2,9 @@ package com.gyl.CrudGyL.dto.response;
 
 import java.time.LocalDate;
 import java.util.List;
+import lombok.Builder;
 
+@Builder
 public record VentaResponseDto(
     Long idVenta,
     Long idCliente,
@@ -10,5 +12,4 @@ public record VentaResponseDto(
     Double total,
     String nombreCliente,
     List<DetalleVentaResponseDto> detalles
-) {
-}
+) {}

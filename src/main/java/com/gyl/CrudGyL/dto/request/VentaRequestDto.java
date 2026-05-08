@@ -7,7 +7,9 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 import java.util.List;
+import lombok.Builder;
 
+@Builder
 public record VentaRequestDto(
     @NotNull(message = "El idCliente no puede ser nulo")
     @Positive(message = "El idCliente debe ser positivo")
@@ -16,5 +18,4 @@ public record VentaRequestDto(
     @NotEmpty(message = "La venta debe tener al menos un detalle")
     @Valid
     List<DetalleVentaRequestDto> detalles
-) {
-}
+) {}
