@@ -107,6 +107,15 @@ public class VentaServiceImpl implements VentaService {
     }
 
     private List<DetalleVenta> construirDetalle(List<DetalleVentaRequestDto> detalleDtos, Venta venta) {
+       long productosUnicos = detalleDtos.stream()
+               .map(DetalleVentaRequestDto::idProducto)
+               .distinct()
+               .count();
+
+       if (productosUnicos < detalleDtos.size()) {
+           throw new BadRequestException("No se pueden incluir productos duplicados en una misma venta");
+       }
+
         return detalleDtos.stream()
                 .map(detalleDto -> {
                     Producto producto = productoRepository.findById(detalleDto.idProducto())
