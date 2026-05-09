@@ -1,5 +1,6 @@
 package com.gyl.CrudGyL.entity;
 
+import com.gyl.CrudGyL.enums.Genero;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,4 +32,14 @@ public class Cliente {
 
     @Column(nullable = false, length = 150)
     private String direccion;
+
+    @Column(nullable = false, unique = true, length = 10)
+    private String dni;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Genero genero;
+
+    @Column(nullable = false, length = 50)
+    private String nacionalidad;
 }
