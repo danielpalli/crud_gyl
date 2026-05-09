@@ -25,9 +25,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional
     public ClienteResponseDto crear(ClienteRequestDto dto) {
-        if (repository.existsByCorreo(dto.correo())) {
-            throw new ConflictException("Ya existe un cliente con el correo: " + dto.correo());
-        }
+        validarCampos(dto.correo(), dto.dni(), null);
 
         Cliente cliente = mapper.toEntity(dto);
         Cliente nuevoCliente = repository.save(cliente);
@@ -56,9 +54,7 @@ public class ClienteServiceImpl implements ClienteService {
                 "No se encontró el id: " + id
             ));
 
-        if (dto.correo() != null && repository.existsByCorreoAndIdClienteNot(dto.correo(), id)) {
-            throw new ConflictException("Ya existe un cliente con el correo: " + dto.correo());
-        }
+        validarCampos(dto.correo(), dto.dni(), id);
 
         mapper.updateEntity(existeCliente,dto);
         return mapper.toDto(existeCliente);
@@ -73,5 +69,25 @@ public class ClienteServiceImpl implements ClienteService {
             ));
 
         repository.delete(cliente);
+    }
+
+    private void validarCampos(String correo, String dni, Long idToExclude) {
+        if (correo != null) {
+            boolean correoExiste = (idToExclude == null)
+                ? repository.existsByCorreo(correo)
+                : repository.existsByCorreoAndIdClienteNot(correo, idToExclude);
+            if (correoExiste) {
+                throw new ConflictException("Ya existe un cliente con el correo: " + correo);
+            }
+        }
+
+        if (dni != null) {
+            boolean dniExiste = (idToExclude == null)
+                ? repository.existsByDni(dni)
+                : repository.existsByDniAndIdClienteNot(dni, idToExclude);
+            if (dniExiste) {
+                throw new ConflictException("Ya existe un cliente con el DNI: " + dni);
+            }
+        }
     }
 }
