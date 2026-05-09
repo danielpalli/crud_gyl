@@ -1,9 +1,7 @@
 package com.gyl.CrudGyL.dto.request;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import com.gyl.CrudGyL.enums.Genero;
+import jakarta.validation.constraints.*;
 import lombok.Builder;
 
 @Builder
@@ -27,5 +25,17 @@ public record ClienteRequestDto(
 
     @NotBlank(message = "La dirección no puede estar vacía")
     @Size(max = 150, message = "La dirección no puede tener más de 150 caracteres")
-    String direccion
+    String direccion,
+
+    @NotBlank(message = "El DNI no puede estar vacío")
+    @Size(max = 10, message = "El DNI no puede tener más de 10 caracteres")
+    @Pattern(regexp = "\\d+", message = "El DNI debe ser un número positivo")
+    String dni,
+
+    @NotNull(message = "El género es obligatorio")
+    Genero genero,
+
+    @NotBlank(message = "La nacionalidad no puede estar vacía")
+    @Size(max = 50, message = "La nacionalidad no puede tener más de 50 caracteres")
+    String nacionalidad
 ) {}
