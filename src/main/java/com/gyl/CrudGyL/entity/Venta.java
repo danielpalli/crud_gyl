@@ -14,6 +14,7 @@ import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @Table(name = "ventas")
+@SQLDelete(sql = "UPDATE ventas SET fecha_anulacion = UTC_TIMESTAMP() WHERE id_venta = ?")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,6 +38,6 @@ public class Venta {
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleVenta> detalles = new ArrayList<>();
 
-    @Column(name = "fecha_anulacion")
+    @Column(nullable = true)
     private Instant fechaAnulacion;
 }
