@@ -2,6 +2,7 @@ package com.gyl.CrudGyL.service.impl;
 
 import com.gyl.CrudGyL.dto.request.DetalleVentaRequestDto;
 import com.gyl.CrudGyL.dto.request.VentaRequestDto;
+import com.gyl.CrudGyL.dto.response.EstadoResponseDto;
 import com.gyl.CrudGyL.dto.response.VentaResponseDto;
 import com.gyl.CrudGyL.entity.Cliente;
 import com.gyl.CrudGyL.entity.DetalleVenta;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -52,8 +54,13 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
-    public List<VentaResponseDto> listar() {
-        return mapper.toDtoList(repository.findAll());
+    public List<VentaResponseDto> listar(String estado) {
+        return mapper.toDtoList(switch (estado.toLowerCase()) {
+            case "activas" -> repository.findByFechaAnulacionIsNull();
+            case "anuladas" -> repository.findByFechaAnulacionIsNotNull();
+            case "todas" -> repository.findAll();
+            default -> throw new BadRequestException("Estado inválido. Use: todas, activas o anuladas.");
+        });
     }
 
     @Override
@@ -93,7 +100,7 @@ public class VentaServiceImpl implements VentaService {
 
     @Override
     @Transactional
-    public void eliminar(Long id) {
+    public EstadoResponseDto anular(Long id) {
         Venta venta = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No se encontró el id: " + id));
@@ -103,7 +110,14 @@ public class VentaServiceImpl implements VentaService {
             producto.setStock(producto.getStock() + detalle.getCantidad());
         });
 
-        repository.delete(venta);
+        venta.setFechaAnulacion(Instant.now());
+
+        return EstadoResponseDto.builder()
+                .id(venta.getIdVenta())
+                .nombre("Venta #" + venta.getIdVenta())
+                .mensaje("La venta fue anulada correctamente")
+                .estado("anulada")
+                .build();
     }
 
     private List<DetalleVenta> construirDetalle(List<DetalleVentaRequestDto> detalleDtos, Venta venta) {

@@ -1,5 +1,6 @@
 package com.gyl.CrudGyL.entity;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @Table(name = "ventas")
@@ -31,6 +33,10 @@ public class Venta {
     @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
 
+    @Builder.Default
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleVenta> detalles = new ArrayList<>();
+
+    @Column(name = "fecha_anulacion")
+    private Instant fechaAnulacion;
 }
