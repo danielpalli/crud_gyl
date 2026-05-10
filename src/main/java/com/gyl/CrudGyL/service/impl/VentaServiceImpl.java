@@ -3,6 +3,8 @@ package com.gyl.CrudGyL.service.impl;
 import com.gyl.CrudGyL.dto.request.DetalleVentaRequestDto;
 import com.gyl.CrudGyL.dto.request.VentaRequestDto;
 import com.gyl.CrudGyL.dto.response.EstadoResponseDto;
+import com.gyl.CrudGyL.dto.response.PageResponseDto;
+import com.gyl.CrudGyL.dto.response.ResumenVentasResponseDto;
 import com.gyl.CrudGyL.dto.response.VentaResponseDto;
 import com.gyl.CrudGyL.entity.Cliente;
 import com.gyl.CrudGyL.entity.DetalleVenta;
@@ -15,7 +17,10 @@ import com.gyl.CrudGyL.repository.ClienteRepository;
 import com.gyl.CrudGyL.repository.ProductoRepository;
 import com.gyl.CrudGyL.repository.VentaRepository;
 import com.gyl.CrudGyL.service.VentaService;
+import com.gyl.CrudGyL.specification.VentaSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,13 +59,32 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
-    public List<VentaResponseDto> listar(String estado) {
-        return mapper.toDtoList(switch (estado.toLowerCase()) {
-            case "activas" -> repository.findByFechaAnulacionIsNull();
-            case "anuladas" -> repository.findByFechaAnulacionIsNotNull();
-            case "todas" -> repository.findAll();
-            default -> throw new BadRequestException("Estado inválido. Use: todas, activas o anuladas.");
-        });
+    public PageResponseDto<VentaResponseDto> listar(String estado, Pageable paginacion) {
+        if (!List.of("todas", "activas", "anuladas").contains(estado.toLowerCase())) {
+            throw new BadRequestException("Estado inválido. Use: todas, activas o anuladas.");
+        }
+
+        Page<Venta> page = repository.findAll(
+                VentaSpecification.conFiltros(estado), paginacion);
+        
+        List<VentaResponseDto> content = mapper.toDtoList(page.getContent());
+        
+        return PageResponseDto.<VentaResponseDto>builder()
+                .contenido(content)
+                .numeroPagina(page.getNumber())
+                .tamanioPagina(page.getSize())
+                .totalElementos(page.getTotalElements())
+                .totalPaginas(page.getTotalPages())
+                .esUltima(page.isLast())
+                .build();
+    }
+
+    @Override
+    public ResumenVentasResponseDto obtenerResumen() {
+        return ResumenVentasResponseDto.builder()
+                .totalGanancias(repository.calcularTotalGanancias())
+                .totalDevoluciones(repository.calcularTotalDevoluciones())
+                .build();
     }
 
     @Override
