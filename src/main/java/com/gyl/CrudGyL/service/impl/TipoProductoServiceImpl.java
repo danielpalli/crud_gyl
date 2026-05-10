@@ -2,8 +2,10 @@ package com.gyl.CrudGyL.service.impl;
 
 import com.gyl.CrudGyL.dto.request.TipoProductoRequestDto;
 import com.gyl.CrudGyL.dto.request.update.TipoProductoUpdateRequestDto;
+import com.gyl.CrudGyL.dto.response.EstadoResponseDto;
 import com.gyl.CrudGyL.dto.response.TipoProductoResponseDto;
 import com.gyl.CrudGyL.entity.TipoProducto;
+import com.gyl.CrudGyL.exception.BadRequestException;
 import com.gyl.CrudGyL.exception.ConflictException;
 import com.gyl.CrudGyL.exception.ResourceNotFoundException;
 import com.gyl.CrudGyL.mapper.TipoProductoMapper;
@@ -37,8 +39,13 @@ public class TipoProductoServiceImpl implements TipoProductoService {
     }
 
     @Override
-    public List<TipoProductoResponseDto> listar() {
-        return mapper.toDtoList(repository.findAll());
+    public List<TipoProductoResponseDto> listar(String estado) {
+        return mapper.toDtoList(switch (estado.toLowerCase()) {
+            case "activos" -> repository.findByFechaBajaIsNull();
+            case "inactivos" -> repository.findByFechaBajaIsNotNull();
+            case "todos" -> repository.findAll();
+            default -> throw new BadRequestException("Estado inválido. Use: todos, activos o inactivos.");
+        });
     }
 
     @Override
@@ -68,7 +75,7 @@ public class TipoProductoServiceImpl implements TipoProductoService {
 
     @Override
     @Transactional
-    public void eliminar(Long id) {
+    public EstadoResponseDto eliminar(Long id) {
         TipoProducto tipoProducto = repository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "No se encontró el tipo de producto con id: " + id
@@ -79,5 +86,29 @@ public class TipoProductoServiceImpl implements TipoProductoService {
         }
 
         repository.delete(tipoProducto);
+        
+        return EstadoResponseDto.builder()
+                .id(tipoProducto.getIdTipoProducto())
+                .nombre(tipoProducto.getNombreTipoProducto())
+                .mensaje("fue dado de baja")
+                .estado("inactivo")
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public EstadoResponseDto restaurar(Long id) {
+        repository.restaurarTipoProducto(id);
+        TipoProducto tipoProducto = repository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "No se encontró el tipo de producto con id: " + id
+            ));
+            
+        return EstadoResponseDto.builder()
+                .id(tipoProducto.getIdTipoProducto())
+                .nombre(tipoProducto.getNombreTipoProducto())
+                .mensaje("fue dado de alta")
+                .estado("activo")
+                .build();
     }
 }

@@ -2,6 +2,7 @@ package com.gyl.CrudGyL.controller;
 
 import com.gyl.CrudGyL.dto.request.TipoProductoRequestDto;
 import com.gyl.CrudGyL.dto.request.update.TipoProductoUpdateRequestDto;
+import com.gyl.CrudGyL.dto.response.EstadoResponseDto;
 import com.gyl.CrudGyL.dto.response.TipoProductoResponseDto;
 import com.gyl.CrudGyL.service.TipoProductoService;
 import jakarta.validation.Valid;
@@ -26,8 +27,8 @@ public class TipoProductoController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<TipoProductoResponseDto> listar() {
-        return tipoProductoService.listar();
+    public List<TipoProductoResponseDto> listar(@RequestParam(defaultValue = "todos") String estado) {
+        return tipoProductoService.listar(estado);
     }
 
     @GetMapping("/{id}")
@@ -43,8 +44,14 @@ public class TipoProductoController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminar(@PathVariable Long id) {
-        tipoProductoService.eliminar(id);
+    @ResponseStatus(HttpStatus.OK)
+    public EstadoResponseDto eliminar(@PathVariable Long id) {
+        return tipoProductoService.eliminar(id);
+    }
+
+    @PatchMapping("/{id}/restaurar")
+    @ResponseStatus(HttpStatus.OK)
+    public EstadoResponseDto restaurar(@PathVariable Long id) {
+        return tipoProductoService.restaurar(id);
     }
 }

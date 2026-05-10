@@ -6,8 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import org.hibernate.annotations.SQLDelete;
+import java.time.Instant;
+
 @Entity
 @Table(name="productos")
+@SQLDelete(sql = "UPDATE productos SET fecha_baja = UTC_TIMESTAMP() WHERE id_producto = ?")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,4 +33,7 @@ public class Producto {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_producto", nullable = false)
     private TipoProducto tipoProducto;
+
+    @Column(name = "fecha_baja")
+    private Instant fechaBaja;
 }

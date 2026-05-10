@@ -1,6 +1,7 @@
 package com.gyl.CrudGyL.dto.response;
 
 import lombok.Builder;
+import java.time.Instant;
 
 @Builder
 public record ProductoResponseDto(
@@ -9,5 +10,6 @@ public record ProductoResponseDto(
     String nombreProducto,
     Double precio,
     Integer stock,
-    String nombreTipoProducto
+    String nombreTipoProducto,
+    Instant fechaBaja
 ) {}
