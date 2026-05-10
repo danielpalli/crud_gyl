@@ -2,16 +2,12 @@ package com.gyl.CrudGyL.repository;
 
 import com.gyl.CrudGyL.entity.TipoProducto;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
-
-public interface TipoProductoRepository extends JpaRepository<TipoProducto, Long> {
-    List<TipoProducto> findByFechaBajaIsNull();
-
-    List<TipoProducto> findByFechaBajaIsNotNull();
+public interface TipoProductoRepository extends JpaRepository<TipoProducto, Long>, JpaSpecificationExecutor<TipoProducto> {
 
     boolean existsByNombreTipoProducto(String nombreTipoProducto);
 

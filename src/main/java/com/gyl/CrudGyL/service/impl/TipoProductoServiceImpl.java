@@ -3,6 +3,7 @@ package com.gyl.CrudGyL.service.impl;
 import com.gyl.CrudGyL.dto.request.TipoProductoRequestDto;
 import com.gyl.CrudGyL.dto.request.update.TipoProductoUpdateRequestDto;
 import com.gyl.CrudGyL.dto.response.EstadoResponseDto;
+import com.gyl.CrudGyL.dto.response.PageResponseDto;
 import com.gyl.CrudGyL.dto.response.TipoProductoResponseDto;
 import com.gyl.CrudGyL.entity.TipoProducto;
 import com.gyl.CrudGyL.exception.BadRequestException;
@@ -12,7 +13,10 @@ import com.gyl.CrudGyL.mapper.TipoProductoMapper;
 import com.gyl.CrudGyL.repository.ProductoRepository;
 import com.gyl.CrudGyL.repository.TipoProductoRepository;
 import com.gyl.CrudGyL.service.TipoProductoService;
+import com.gyl.CrudGyL.specification.TipoProductoSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,13 +43,23 @@ public class TipoProductoServiceImpl implements TipoProductoService {
     }
 
     @Override
-    public List<TipoProductoResponseDto> listar(String estado) {
-        return mapper.toDtoList(switch (estado.toLowerCase()) {
-            case "activos" -> repository.findByFechaBajaIsNull();
-            case "inactivos" -> repository.findByFechaBajaIsNotNull();
-            case "todos" -> repository.findAll();
-            default -> throw new BadRequestException("Estado inválido. Use: todos, activos o inactivos.");
-        });
+    public PageResponseDto<TipoProductoResponseDto> listar(String estado, String busqueda, Pageable paginacion) {
+        if (!List.of("todos", "activos", "inactivos").contains(estado.toLowerCase())) {
+            throw new BadRequestException("Estado inválido. Use: todos, activos o inactivos.");
+        }
+
+        Page<TipoProducto> page = repository.findAll(
+                TipoProductoSpecification.conFiltros(estado, busqueda), paginacion);
+        List<TipoProductoResponseDto> content = mapper.toDtoList(page.getContent());
+
+        return PageResponseDto.<TipoProductoResponseDto>builder()
+                .contenido(content)
+                .numeroPagina(page.getNumber())
+                .tamanioPagina(page.getSize())
+                .totalElementos(page.getTotalElements())
+                .totalPaginas(page.getTotalPages())
+                .esUltima(page.isLast())
+                .build();
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.gyl.CrudGyL.service.impl;
 import com.gyl.CrudGyL.dto.request.ProductoRequestDto;
 import com.gyl.CrudGyL.dto.request.update.ProductoUpdateRequestDto;
 import com.gyl.CrudGyL.dto.response.EstadoResponseDto;
+import com.gyl.CrudGyL.dto.response.PageResponseDto;
 import com.gyl.CrudGyL.dto.response.ProductoResponseDto;
 import com.gyl.CrudGyL.entity.Producto;
 import com.gyl.CrudGyL.entity.TipoProducto;
@@ -13,7 +14,10 @@ import com.gyl.CrudGyL.mapper.ProductoMapper;
 import com.gyl.CrudGyL.repository.ProductoRepository;
 import com.gyl.CrudGyL.repository.TipoProductoRepository;
 import com.gyl.CrudGyL.service.ProductoService;
+import com.gyl.CrudGyL.specification.ProductoSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,13 +45,23 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
-    public List<ProductoResponseDto> listar(String estado) {
-        return mapper.toDtoList(switch (estado.toLowerCase()) {
-            case "activos" -> repository.findByFechaBajaIsNull();
-            case "inactivos" -> repository.findByFechaBajaIsNotNull();
-            case "todos" -> repository.findAll();
-            default -> throw new BadRequestException("Estado inválido. Use: todos, activos o inactivos.");
-        });
+    public PageResponseDto<ProductoResponseDto> listar(String estado, String busqueda, Pageable paginacion) {
+        if (!List.of("todos", "activos", "inactivos").contains(estado.toLowerCase())) {
+            throw new BadRequestException("Estado inválido. Use: todos, activos o inactivos.");
+        }
+
+        Page<Producto> page = repository.findAll(
+                ProductoSpecification.conFiltros(estado, busqueda), paginacion);
+        List<ProductoResponseDto> content = mapper.toDtoList(page.getContent());
+
+        return PageResponseDto.<ProductoResponseDto>builder()
+                .contenido(content)
+                .numeroPagina(page.getNumber())
+                .tamanioPagina(page.getSize())
+                .totalElementos(page.getTotalElements())
+                .totalPaginas(page.getTotalPages())
+                .esUltima(page.isLast())
+                .build();
     }
 
     @Override
