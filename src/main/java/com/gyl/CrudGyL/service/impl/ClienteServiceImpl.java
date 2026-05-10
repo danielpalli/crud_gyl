@@ -79,7 +79,7 @@ public class ClienteServiceImpl implements ClienteService {
         return EstadoResponseDto.builder()
                 .id(cliente.getIdCliente())
                 .nombre(cliente.getNombre())
-                .message("fue dado de baja")
+                .mensaje("fue dado de baja")
                 .estado("inactivo")
                 .build();
     }
@@ -95,7 +95,7 @@ public class ClienteServiceImpl implements ClienteService {
         return EstadoResponseDto.builder()
                 .id(cliente.getIdCliente())
                 .nombre(cliente.getNombre())
-                .message("fue dado de alta")
+                .mensaje("fue dado de alta")
                 .estado("activo")
                 .build();
     }
