@@ -6,9 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import java.time.Instant;
 
 @Entity
 @Table(name = "clientes")
+@SQLDelete(sql = "UPDATE clientes SET fecha_baja = UTC_TIMESTAMP() WHERE id_cliente = ?")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -42,4 +45,7 @@ public class Cliente {
 
     @Column(nullable = false, length = 50)
     private String nacionalidad;
+
+    @Column(name = "fecha_baja")
+    private Instant fechaBaja;
 }
