@@ -4,6 +4,7 @@ import com.gyl.CrudGyL.dto.request.ClienteRequestDto;
 import com.gyl.CrudGyL.dto.request.update.ClienteUpdateRequestDto;
 import com.gyl.CrudGyL.dto.response.ClienteResponseDto;
 import com.gyl.CrudGyL.dto.response.EstadoResponseDto;
+import com.gyl.CrudGyL.dto.response.PageResponseDto;
 import com.gyl.CrudGyL.entity.Cliente;
 import com.gyl.CrudGyL.exception.BadRequestException;
 import com.gyl.CrudGyL.exception.ConflictException;
@@ -11,7 +12,10 @@ import com.gyl.CrudGyL.exception.ResourceNotFoundException;
 import com.gyl.CrudGyL.mapper.ClienteMapper;
 import com.gyl.CrudGyL.repository.ClienteRepository;
 import com.gyl.CrudGyL.service.ClienteService;
+import com.gyl.CrudGyL.specification.ClienteSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,13 +39,23 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
-    public List<ClienteResponseDto> listar(String estado) {
-        return mapper.toDtoList(switch (estado.toLowerCase()) {
-            case "activos" -> repository.findByFechaBajaIsNull();
-            case "inactivos" -> repository.findByFechaBajaIsNotNull();
-            case "todos" -> repository.findAll();
-            default -> throw new BadRequestException("Estado inválido. Use: todos, activos o inactivos.");
-        });
+    public PageResponseDto<ClienteResponseDto> listar(String estado, String busqueda, Pageable paginacion) {
+        if (!List.of("todos", "activos", "inactivos").contains(estado.toLowerCase())) {
+            throw new BadRequestException("Estado inválido. Use: todos, activos o inactivos.");
+        }
+
+        Page<Cliente> page = repository.findAll(
+                ClienteSpecification.conFiltros(estado, busqueda), paginacion);
+        List<ClienteResponseDto> content = mapper.toDtoList(page.getContent());
+
+        return PageResponseDto.<ClienteResponseDto>builder()
+                .contenido(content)
+                .numeroPagina(page.getNumber())
+                .tamanioPagina(page.getSize())
+                .totalElementos(page.getTotalElements())
+                .totalPaginas(page.getTotalPages())
+                .esUltima(page.isLast())
+                .build();
     }
 
     @Override

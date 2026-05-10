@@ -4,14 +4,17 @@ import com.gyl.CrudGyL.dto.request.ClienteRequestDto;
 import com.gyl.CrudGyL.dto.request.update.ClienteUpdateRequestDto;
 import com.gyl.CrudGyL.dto.response.ClienteResponseDto;
 import com.gyl.CrudGyL.dto.response.EstadoResponseDto;
+import com.gyl.CrudGyL.dto.response.PageResponseDto;
 import com.gyl.CrudGyL.service.ClienteService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/clientes")
@@ -27,8 +30,18 @@ public class ClienteController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ClienteResponseDto> listar(@RequestParam(defaultValue = "todos") String estado){
-        return clienteService.listar(estado);
+    public PageResponseDto<ClienteResponseDto> listar(
+            @RequestParam(defaultValue = "todos") String estado,
+            @RequestParam(required = false) String busqueda,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanio,
+            @RequestParam(defaultValue = "idCliente") String campoOrden,
+            @RequestParam(defaultValue = "asc") String tipoOrden){
+        
+        Direction tipoDeOrden = tipoOrden.equalsIgnoreCase("desc") ? Direction.DESC : Direction.ASC;
+        Pageable paginacion = PageRequest.of(pagina, tamanio, Sort.by(tipoDeOrden, campoOrden));
+        
+        return clienteService.listar(estado, busqueda, paginacion);
     }
 
     @GetMapping("/{id}")

@@ -2,18 +2,14 @@ package com.gyl.CrudGyL.repository;
 
 import com.gyl.CrudGyL.entity.Cliente;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface ClienteRepository extends JpaRepository<Cliente, Long> {
-    List<Cliente> findByFechaBajaIsNull();
-
-    List<Cliente> findByFechaBajaIsNotNull();
+public interface ClienteRepository extends JpaRepository<Cliente, Long>, JpaSpecificationExecutor<Cliente> {
 
     boolean existsByCorreo(String correo);
 
