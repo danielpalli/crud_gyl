@@ -2,6 +2,7 @@ package com.gyl.CrudGyL.dto.response;
 
 import com.gyl.CrudGyL.enums.Genero;
 import lombok.Builder;
+import java.time.Instant;
 
 @Builder
 public record ClienteResponseDto(
@@ -13,5 +14,6 @@ public record ClienteResponseDto(
     String direccion,
     String dni,
     Genero genero,
-    String nacionalidad
+    String nacionalidad,
+    Instant fechaBaja
 ) {}

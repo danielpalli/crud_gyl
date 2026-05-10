@@ -3,17 +3,20 @@ package com.gyl.CrudGyL.service;
 import com.gyl.CrudGyL.dto.request.ClienteRequestDto;
 import com.gyl.CrudGyL.dto.request.update.ClienteUpdateRequestDto;
 import com.gyl.CrudGyL.dto.response.ClienteResponseDto;
+import com.gyl.CrudGyL.dto.response.EstadoResponseDto;
 
 import java.util.List;
 
 public interface ClienteService {
     ClienteResponseDto crear(ClienteRequestDto dto);
 
-    List<ClienteResponseDto> listar();
+    List<ClienteResponseDto> listar(String estado);
 
     ClienteResponseDto buscarPorId(Long id);
 
     ClienteResponseDto actualizar(Long id, ClienteUpdateRequestDto dto);
 
-    void eliminar(Long id);
+    EstadoResponseDto eliminar(Long id);
+
+    EstadoResponseDto restaurar(Long id);
 }

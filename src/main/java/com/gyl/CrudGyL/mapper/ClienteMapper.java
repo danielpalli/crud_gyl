@@ -14,6 +14,7 @@ import java.util.List;
 @Mapper(config = GlobalMapperConfig.class)
 public interface ClienteMapper {
     @Mapping(target = "idCliente", ignore = true)
+    @Mapping(target = "fechaBaja", ignore = true)
     Cliente toEntity(ClienteRequestDto dto);
 
     ClienteResponseDto toDto(Cliente entity);
@@ -21,5 +22,6 @@ public interface ClienteMapper {
     List<ClienteResponseDto> toDtoList(List<Cliente> listEntity);
 
     @Mapping(target = "idCliente", ignore = true)
+    @Mapping(target = "fechaBaja", ignore = true)
     void updateEntity(@MappingTarget Cliente entity, ClienteUpdateRequestDto dto);
 }

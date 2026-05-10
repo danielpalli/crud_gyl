@@ -46,6 +46,6 @@ public class Cliente {
     @Column(nullable = false, length = 50)
     private String nacionalidad;
 
-    @Column(name = "fecha_baja")
+    @Column(nullable = true)
     private Instant fechaBaja;
 }

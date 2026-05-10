@@ -3,7 +3,9 @@ package com.gyl.CrudGyL.service.impl;
 import com.gyl.CrudGyL.dto.request.ClienteRequestDto;
 import com.gyl.CrudGyL.dto.request.update.ClienteUpdateRequestDto;
 import com.gyl.CrudGyL.dto.response.ClienteResponseDto;
+import com.gyl.CrudGyL.dto.response.EstadoResponseDto;
 import com.gyl.CrudGyL.entity.Cliente;
+import com.gyl.CrudGyL.exception.BadRequestException;
 import com.gyl.CrudGyL.exception.ConflictException;
 import com.gyl.CrudGyL.exception.ResourceNotFoundException;
 import com.gyl.CrudGyL.mapper.ClienteMapper;
@@ -33,8 +35,13 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
-    public List<ClienteResponseDto> listar() {
-        return mapper.toDtoList(repository.findAll());
+    public List<ClienteResponseDto> listar(String estado) {
+        return mapper.toDtoList(switch (estado.toLowerCase()) {
+            case "activos" -> repository.findByFechaBajaIsNull();
+            case "inactivos" -> repository.findByFechaBajaIsNotNull();
+            case "todos" -> repository.findAll();
+            default -> throw new BadRequestException("Estado inválido. Use: todos, activos o inactivos.");
+        });
     }
 
     @Override
@@ -62,13 +69,35 @@ public class ClienteServiceImpl implements ClienteService {
 
     @Override
     @Transactional
-    public void eliminar(Long id) {
+    public EstadoResponseDto eliminar(Long id) {
         Cliente cliente = repository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "No se encontró el id: " + id
             ));
 
         repository.delete(cliente);
+        return EstadoResponseDto.builder()
+                .id(cliente.getIdCliente())
+                .nombre(cliente.getNombre())
+                .message("fue dado de baja")
+                .estado("inactivo")
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public EstadoResponseDto restaurar(Long id) {
+        repository.restaurarCliente(id);
+        Cliente cliente = repository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "No se encontró el id: " + id
+            ));
+        return EstadoResponseDto.builder()
+                .id(cliente.getIdCliente())
+                .nombre(cliente.getNombre())
+                .message("fue dado de alta")
+                .estado("activo")
+                .build();
     }
 
     private void validarCampos(String correo, String dni, Long idToExclude) {
