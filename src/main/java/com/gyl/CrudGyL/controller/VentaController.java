@@ -4,6 +4,7 @@ import com.gyl.CrudGyL.dto.request.VentaRequestDto;
 import com.gyl.CrudGyL.dto.response.EstadoResponseDto;
 import com.gyl.CrudGyL.dto.response.PageResponseDto;
 import com.gyl.CrudGyL.dto.response.ResumenVentasResponseDto;
+import com.gyl.CrudGyL.dto.response.TopProductoResponseDto;
 import com.gyl.CrudGyL.dto.response.VentaHistorialClienteResponseDto;
 import com.gyl.CrudGyL.dto.response.VentaHistorialResponseDto;
 import com.gyl.CrudGyL.dto.response.VentaResponseDto;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/ventas")
@@ -51,6 +53,12 @@ public class VentaController {
     @ResponseStatus(HttpStatus.OK)
     public ResumenVentasResponseDto obtenerResumen() {
         return ventaService.obtenerResumen();
+    }
+
+    @GetMapping("/top-productos")
+    @ResponseStatus(HttpStatus.OK)
+    public List<TopProductoResponseDto> obtenerTopProductosMasVendidos() {
+        return ventaService.obtenerTopProductosMasVendidos();
     }
 
     @GetMapping("/{id}")

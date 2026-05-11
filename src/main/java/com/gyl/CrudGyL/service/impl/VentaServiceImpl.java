@@ -5,6 +5,7 @@ import com.gyl.CrudGyL.dto.request.VentaRequestDto;
 import com.gyl.CrudGyL.dto.response.EstadoResponseDto;
 import com.gyl.CrudGyL.dto.response.PageResponseDto;
 import com.gyl.CrudGyL.dto.response.ResumenVentasResponseDto;
+import com.gyl.CrudGyL.dto.response.TopProductoResponseDto;
 import com.gyl.CrudGyL.dto.response.VentaHistorialClienteResponseDto;
 import com.gyl.CrudGyL.dto.response.VentaHistorialResponseDto;
 import com.gyl.CrudGyL.dto.response.VentaResponseDto;
@@ -22,6 +23,7 @@ import com.gyl.CrudGyL.service.VentaService;
 import com.gyl.CrudGyL.specification.VentaSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -170,6 +172,11 @@ public class VentaServiceImpl implements VentaService {
                 .ventas(construirPaginaVentas(page))
                 .resumen(repository.obtenerResumenPorRango(fechaInicio, fechaFin))
                 .build();
+    }
+
+    @Override
+    public List<TopProductoResponseDto> obtenerTopProductosMasVendidos() {
+        return repository.obtenerTopProductosMasVendidos(PageRequest.of(0, 5));
     }
 
     private List<DetalleVenta> construirDetalle(List<DetalleVentaRequestDto> detalleDtos, Venta venta) {

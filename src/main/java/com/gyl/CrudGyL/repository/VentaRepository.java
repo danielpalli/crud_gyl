@@ -2,7 +2,9 @@ package com.gyl.CrudGyL.repository;
 
 import com.gyl.CrudGyL.dto.response.ResumenPerfilClienteResponseDto;
 import com.gyl.CrudGyL.dto.response.ResumenVentasResponseDto;
+import com.gyl.CrudGyL.dto.response.TopProductoResponseDto;
 import com.gyl.CrudGyL.entity.Venta;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -44,6 +46,22 @@ public interface VentaRepository extends JpaRepository<Venta, Long>, JpaSpecific
            "MAX(v.fechaVenta)) " +
            "FROM Venta v WHERE v.cliente.idCliente = :idCliente")
     ResumenPerfilClienteResponseDto obtenerResumenCliente(@Param("idCliente") Long idCliente);
+
+    @Query("""
+            SELECT new com.gyl.CrudGyL.dto.response.TopProductoResponseDto(
+                p.idProducto,
+                p.nombreProducto,
+                SUM(d.cantidad),
+                COALESCE(SUM(d.subtotal), 0.0)
+            )
+            FROM DetalleVenta d
+            JOIN d.producto p
+            JOIN d.venta v
+            WHERE v.fechaAnulacion IS NULL
+            GROUP BY p.idProducto, p.nombreProducto
+            ORDER BY SUM(d.cantidad) DESC, COALESCE(SUM(d.subtotal), 0.0) DESC, p.nombreProducto ASC
+            """)
+    List<TopProductoResponseDto> obtenerTopProductosMasVendidos(Pageable limite);
 
     @Modifying
     @Query(value = "UPDATE ventas SET fecha_anulacion = NULL WHERE id_venta = :id", nativeQuery = true)
