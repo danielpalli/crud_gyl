@@ -5,6 +5,8 @@ import com.gyl.CrudGyL.dto.request.VentaRequestDto;
 import com.gyl.CrudGyL.dto.response.EstadoResponseDto;
 import com.gyl.CrudGyL.dto.response.PageResponseDto;
 import com.gyl.CrudGyL.dto.response.ResumenVentasResponseDto;
+import com.gyl.CrudGyL.dto.response.VentaHistorialClienteResponseDto;
+import com.gyl.CrudGyL.dto.response.VentaHistorialResponseDto;
 import com.gyl.CrudGyL.dto.response.VentaResponseDto;
 import com.gyl.CrudGyL.entity.Cliente;
 import com.gyl.CrudGyL.entity.DetalleVenta;
@@ -27,6 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,29 +73,18 @@ public class VentaServiceImpl implements VentaService {
         Page<Venta> page = repository.findAll(
                 VentaSpecification.conFiltros(estado), paginacion);
         
-        List<VentaResponseDto> content = mapper.toDtoList(page.getContent());
-        
-        return PageResponseDto.<VentaResponseDto>builder()
-                .contenido(content)
-                .numeroPagina(page.getNumber())
-                .tamanioPagina(page.getSize())
-                .totalElementos(page.getTotalElements())
-                .totalPaginas(page.getTotalPages())
-                .esUltima(page.isLast())
-                .build();
+        return construirPaginaVentas(page);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResumenVentasResponseDto obtenerResumen() {
-        return ResumenVentasResponseDto.builder()
-                .totalGanancias(repository.calcularTotalGanancias())
-                .totalDevoluciones(repository.calcularTotalDevoluciones())
-                .build();
+        return repository.obtenerResumenGlobal();
     }
 
     @Override
     public VentaResponseDto buscarPorId(Long id) {
-        return repository.findById(id)
+        return repository.findByIdVenta(id)
                 .map(mapper::toDto)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No se encontró el id: " + id));
@@ -144,21 +139,62 @@ public class VentaServiceImpl implements VentaService {
                 .build();
     }
 
-    private List<DetalleVenta> construirDetalle(List<DetalleVentaRequestDto> detalleDtos, Venta venta) {
-       long productosUnicos = detalleDtos.stream()
-               .map(DetalleVentaRequestDto::idProducto)
-               .distinct()
-               .count();
+    @Override
+    public VentaHistorialClienteResponseDto obtenerHistorialCliente(Long idCliente, Pageable paginacion) {
+        clienteRepository.findById(idCliente)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se encontró el cliente con id: " + idCliente));
 
-       if (productosUnicos < detalleDtos.size()) {
-           throw new BadRequestException("No se pueden incluir productos duplicados en una misma venta");
-       }
+        Page<Venta> page = repository.findAll(
+                VentaSpecification.porCliente(idCliente), paginacion);
+
+        return VentaHistorialClienteResponseDto.builder()
+                .ventas(construirPaginaVentas(page))
+                .resumen(repository.obtenerResumenCliente(idCliente))
+                .build();
+    }
+
+    @Override
+    public VentaHistorialResponseDto obtenerVentasPorRango(LocalDate inicio, LocalDate fin, Pageable paginacion) {
+        LocalDate fechaInicio = (inicio != null) ? inicio : LocalDate.now();
+        LocalDate fechaFin = (fin != null) ? fin : LocalDate.now();
+
+        if (fechaInicio.isAfter(fechaFin)) {
+            throw new BadRequestException("La fecha de inicio no puede ser posterior a la fecha de fin.");
+        }
+
+        Page<Venta> page = repository.findAll(
+                VentaSpecification.porRangoFechas(fechaInicio, fechaFin), paginacion);
+
+        return VentaHistorialResponseDto.builder()
+                .ventas(construirPaginaVentas(page))
+                .resumen(repository.obtenerResumenPorRango(fechaInicio, fechaFin))
+                .build();
+    }
+
+    private List<DetalleVenta> construirDetalle(List<DetalleVentaRequestDto> detalleDtos, Venta venta) {
+        Set<Long> idsProductos = detalleDtos.stream()
+                .map(DetalleVentaRequestDto::idProducto)
+                .collect(Collectors.toSet());
+
+        if (idsProductos.size() < detalleDtos.size()) {
+            throw new BadRequestException("No se pueden incluir productos duplicados en una misma venta");
+        }
+
+        Map<Long, Producto> productos = productoRepository.findAllById(idsProductos).stream()
+                .collect(Collectors.toMap(Producto::getIdProducto, Function.identity()));
+
+        if (productos.size() != idsProductos.size()) {
+            Long idFaltante = idsProductos.stream()
+                    .filter(id -> !productos.containsKey(id))
+                    .findFirst()
+                    .orElse(null);
+            throw new ResourceNotFoundException("Producto no encontrado con id: " + idFaltante);
+        }
 
         return detalleDtos.stream()
                 .map(detalleDto -> {
-                    Producto producto = productoRepository.findById(detalleDto.idProducto())
-                            .orElseThrow(() -> new ResourceNotFoundException(
-                                    "Producto no encontrado con id: " + detalleDto.idProducto()));
+                    Producto producto = productos.get(detalleDto.idProducto());
 
                     if (producto.getStock() < detalleDto.cantidad()) {
                         throw new BadRequestException("No hay stock suficiente para el producto: "
@@ -181,5 +217,34 @@ public class VentaServiceImpl implements VentaService {
         return detalles.stream()
                 .mapToDouble(DetalleVenta::getSubtotal)
                 .sum();
+    }
+
+    private PageResponseDto<VentaResponseDto> construirPaginaVentas(Page<Venta> page) {
+        return PageResponseDto.<VentaResponseDto>builder()
+                .contenido(mapearVentasCompletas(page.getContent()))
+                .numeroPagina(page.getNumber())
+                .tamanioPagina(page.getSize())
+                .totalElementos(page.getTotalElements())
+                .totalPaginas(page.getTotalPages())
+                .esUltima(page.isLast())
+                .build();
+    }
+
+    private List<VentaResponseDto> mapearVentasCompletas(List<Venta> ventas) {
+        if (ventas.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> ids = ventas.stream()
+                .map(Venta::getIdVenta)
+                .toList();
+
+        Map<Long, Venta> ventasCompletas = repository.findDistinctByIdVentaIn(ids).stream()
+                .collect(Collectors.toMap(Venta::getIdVenta, Function.identity(), (actual, repetida) -> actual));
+
+        return ids.stream()
+                .map(ventasCompletas::get)
+                .map(mapper::toDto)
+                .toList();
     }
 }
