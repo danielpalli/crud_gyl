@@ -16,6 +16,7 @@ public interface ProductoMapper {
     @Mapping(target = "idProducto", ignore = true)
     @Mapping(target = "tipoProducto", ignore = true)
     @Mapping(target = "fechaBaja", ignore = true)
+    @Mapping(target = "estadoProducto", ignore = true)
     Producto toEntity(ProductoRequestDto dto);
 
     @Mapping(source = "tipoProducto.idTipoProducto", target = "idTipoProducto")
@@ -27,5 +28,6 @@ public interface ProductoMapper {
     @Mapping(target = "idProducto", ignore = true)
     @Mapping(target = "tipoProducto", ignore = true)
     @Mapping(target = "fechaBaja", ignore = true)
+    @Mapping(target = "estadoProducto", ignore = true)
     void updateEntity(@MappingTarget Producto entity, ProductoUpdateRequestDto dto);
 }

@@ -15,8 +15,11 @@ public class ProductoSpecification {
 
             if ("activos".equalsIgnoreCase(estado)) {
                 predicados.add(cb.isNull(root.get("fechaBaja")));
+                predicados.add(cb.isTrue(root.get("estadoProducto")));
             } else if ("inactivos".equalsIgnoreCase(estado)) {
-                predicados.add(cb.isNotNull(root.get("fechaBaja")));
+                predicados.add(cb.or(
+                        cb.isNotNull(root.get("fechaBaja")),
+                        cb.isFalse(root.get("estadoProducto"))));
             }
 
             if (busqueda != null && !busqueda.isBlank()) {

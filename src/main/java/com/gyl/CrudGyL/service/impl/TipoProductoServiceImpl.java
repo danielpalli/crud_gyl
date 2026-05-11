@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -95,11 +96,10 @@ public class TipoProductoServiceImpl implements TipoProductoService {
                 "No se encontró el tipo de producto con id: " + id
             ));
 
-        if (productoRepository.existsByTipoProductoIdTipoProducto(id)) {
-            throw new ConflictException("No se puede eliminar el tipo de producto porque tiene prductos asociados.");
-        }
+        Instant fechaBaja = Instant.now();
 
-        repository.delete(tipoProducto);
+        tipoProducto.setFechaBaja(fechaBaja);
+        productoRepository.inactivarPorTipoProducto(id);
         
         return EstadoResponseDto.builder()
                 .id(tipoProducto.getIdTipoProducto())
@@ -113,6 +113,8 @@ public class TipoProductoServiceImpl implements TipoProductoService {
     @Transactional
     public EstadoResponseDto restaurar(Long id) {
         repository.restaurarTipoProducto(id);
+        productoRepository.restaurarPorTipoProducto(id);
+
         TipoProducto tipoProducto = repository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "No se encontró el tipo de producto con id: " + id

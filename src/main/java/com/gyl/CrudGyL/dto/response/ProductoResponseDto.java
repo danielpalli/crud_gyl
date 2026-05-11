@@ -11,5 +11,6 @@ public record ProductoResponseDto(
     Double precio,
     Integer stock,
     String nombreTipoProducto,
-    Instant fechaBaja
+    Instant fechaBaja,
+    Boolean estadoProducto
 ) {}

@@ -39,7 +39,9 @@ public class ProductoServiceImpl implements ProductoService {
         }
 
         Producto producto = mapper.toEntity(dto);
-        producto.setTipoProducto(buscarTipoProducto(dto.idTipoProducto()));
+        TipoProducto tipoProducto = buscarTipoProducto(dto.idTipoProducto());
+        validarTipoProductoActivo(tipoProducto);
+        producto.setTipoProducto(tipoProducto);
         Producto nuevoProducto = repository.save(producto);
         return mapper.toDto(nuevoProducto);
     }
@@ -93,7 +95,11 @@ public class ProductoServiceImpl implements ProductoService {
             TipoProducto tipoProducto = tipoProductoRepository.findById(dto.idTipoProducto())
                 .orElseThrow(() -> new ResourceNotFoundException(
                     "No se encontró el tipo de producto con id: " + dto.idTipoProducto()));
+            validarTipoProductoActivo(tipoProducto);
             producto.setTipoProducto(tipoProducto);
+            if (producto.getFechaBaja() == null) {
+                producto.setEstadoProducto(true);
+            }
         }
         return mapper.toDto(producto);
     }
@@ -105,9 +111,6 @@ public class ProductoServiceImpl implements ProductoService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No se encontró el id: " + id));
 
-        if (repository.existsInVentas(id)) {
-            throw new ConflictException("No se puede eliminar el producto por que tiene ventas asociadas.");
-        }
         repository.delete(producto);
         
         return EstadoResponseDto.builder()
@@ -121,10 +124,13 @@ public class ProductoServiceImpl implements ProductoService {
     @Override
     @Transactional
     public EstadoResponseDto restaurar(Long id) {
-        repository.restaurarProducto(id);
         Producto producto = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No se encontró el id: " + id));
+
+        validarTipoProductoActivo(producto.getTipoProducto());
+
+        repository.restaurarProducto(id);
                         
         return EstadoResponseDto.builder()
                 .id(producto.getIdProducto())
@@ -138,6 +144,12 @@ public class ProductoServiceImpl implements ProductoService {
         return tipoProductoRepository.findById(idTipoProducto)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "No se encontró el tipo de producto con id: " + idTipoProducto));
+    }
+
+    private void validarTipoProductoActivo(TipoProducto tipoProducto) {
+        if (tipoProducto.getFechaBaja() != null) {
+            throw new ConflictException("No se puede asociar un producto a un tipo de producto inactivo.");
+        }
     }
 
 }

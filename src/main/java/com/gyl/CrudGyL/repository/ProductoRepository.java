@@ -25,6 +25,23 @@ public interface ProductoRepository extends JpaRepository<Producto, Long>, JpaSp
     boolean existsInVentas(@Param("id") Long id);
 
     @Modifying
-    @Query(value = "UPDATE productos SET fecha_baja = NULL WHERE id_producto = :id", nativeQuery = true)
+    @Query(value = "UPDATE productos SET fecha_baja = NULL, estado_producto = true WHERE id_producto = :id", nativeQuery = true)
     void restaurarProducto(@Param("id") Long id);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("""
+            UPDATE Producto p
+            SET p.estadoProducto = false
+            WHERE p.tipoProducto.idTipoProducto = :idTipoProducto
+            """)
+    int inactivarPorTipoProducto(@Param("idTipoProducto") Long idTipoProducto);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("""
+            UPDATE Producto p
+            SET p.estadoProducto = true
+            WHERE p.tipoProducto.idTipoProducto = :idTipoProducto
+              AND p.fechaBaja IS NULL
+            """)
+    int restaurarPorTipoProducto(@Param("idTipoProducto") Long idTipoProducto);
 }

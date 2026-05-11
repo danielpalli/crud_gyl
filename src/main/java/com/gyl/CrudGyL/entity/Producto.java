@@ -11,7 +11,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name="productos")
-@SQLDelete(sql = "UPDATE productos SET fecha_baja = UTC_TIMESTAMP() WHERE id_producto = ?")
+@SQLDelete(sql = "UPDATE productos SET fecha_baja = UTC_TIMESTAMP(), estado_producto = false WHERE id_producto = ?")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,4 +36,8 @@ public class Producto {
 
     @Column(name = "fecha_baja")
     private Instant fechaBaja;
+
+    @Builder.Default
+    @Column(name = "estado_producto", nullable = false, columnDefinition = "boolean default true")
+    private Boolean estadoProducto = true;
 }
