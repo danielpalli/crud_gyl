@@ -1,7 +1,9 @@
 package com.gyl.CrudGyL.dto.request;
 
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 
+@Builder
 public record ProductoRequestDto(
     @NotBlank(message = "El nombre del producto del producto no puede estar vacío")
     @Size(max = 100, message = "El nombre del producto no puede tener más de 100 caracteres")

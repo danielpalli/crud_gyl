@@ -1,19 +1,24 @@
 package com.gyl.CrudGyL.entity;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @Table(name = "ventas")
+@SQLDelete(sql = "UPDATE ventas SET fecha_anulacion = UTC_TIMESTAMP() WHERE id_venta = ?")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Venta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +34,10 @@ public class Venta {
     @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
 
+    @Builder.Default
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleVenta> detalles = new ArrayList<>();
+
+    @Column(nullable = true)
+    private Instant fechaAnulacion;
 }

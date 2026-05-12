@@ -2,10 +2,16 @@ package com.gyl.CrudGyL.controller;
 
 import com.gyl.CrudGyL.dto.request.ProductoRequestDto;
 import com.gyl.CrudGyL.dto.request.update.ProductoUpdateRequestDto;
+import com.gyl.CrudGyL.dto.response.EstadoResponseDto;
+import com.gyl.CrudGyL.dto.response.PageResponseDto;
 import com.gyl.CrudGyL.dto.response.ProductoResponseDto;
 import com.gyl.CrudGyL.service.ProductoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,8 +31,18 @@ public class ProductoController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ProductoResponseDto> listar() {
-        return productoService.listar();
+    public PageResponseDto<ProductoResponseDto> listar(
+            @RequestParam(defaultValue = "todos") String estado,
+            @RequestParam(required = false) String busqueda,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanio,
+            @RequestParam(defaultValue = "idProducto") String campoOrden,
+            @RequestParam(defaultValue = "asc") String tipoOrden) {
+        
+        Direction tipoDeOrden = tipoOrden.equalsIgnoreCase("desc") ? Direction.DESC : Direction.ASC;
+        Pageable paginacion = PageRequest.of(pagina, tamanio, Sort.by(tipoDeOrden, campoOrden));
+        
+        return productoService.listar(estado, busqueda, paginacion);
     }
 
     @GetMapping("/{id}")
@@ -48,8 +64,14 @@ public class ProductoController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminar(@PathVariable Long id) {
-        productoService.eliminar(id);
+    @ResponseStatus(HttpStatus.OK)
+    public EstadoResponseDto eliminar(@PathVariable Long id) {
+        return productoService.eliminar(id);
+    }
+
+    @PatchMapping("/{id}/restaurar")
+    @ResponseStatus(HttpStatus.OK)
+    public EstadoResponseDto restaurar(@PathVariable Long id) {
+        return productoService.restaurar(id);
     }
 }

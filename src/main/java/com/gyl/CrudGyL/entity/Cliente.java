@@ -1,15 +1,21 @@
 package com.gyl.CrudGyL.entity;
 
+import com.gyl.CrudGyL.enums.Genero;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import java.time.Instant;
 
 @Entity
 @Table(name = "clientes")
+@SQLDelete(sql = "UPDATE clientes SET fecha_baja = UTC_TIMESTAMP() WHERE id_cliente = ?")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 public class Cliente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,4 +35,17 @@ public class Cliente {
 
     @Column(nullable = false, length = 150)
     private String direccion;
+
+    @Column(nullable = false, unique = true, length = 10)
+    private String dni;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Genero genero;
+
+    @Column(nullable = false, length = 50)
+    private String nacionalidad;
+
+    @Column(nullable = true)
+    private Instant fechaBaja;
 }

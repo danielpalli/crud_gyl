@@ -2,7 +2,10 @@ package com.gyl.CrudGyL.service;
 
 import com.gyl.CrudGyL.dto.request.ProductoRequestDto;
 import com.gyl.CrudGyL.dto.request.update.ProductoUpdateRequestDto;
+import com.gyl.CrudGyL.dto.response.PageResponseDto;
 import com.gyl.CrudGyL.dto.response.ProductoResponseDto;
+import com.gyl.CrudGyL.dto.response.EstadoResponseDto;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -10,7 +13,7 @@ public interface ProductoService {
 
     ProductoResponseDto crear(ProductoRequestDto dto);
 
-    List<ProductoResponseDto> listar();
+    PageResponseDto<ProductoResponseDto> listar(String estado, String busqueda, Pageable paginacion);
 
     ProductoResponseDto buscarPorId(Long id);
 
@@ -18,5 +21,7 @@ public interface ProductoService {
 
     ProductoResponseDto actualizar(Long id, ProductoUpdateRequestDto dto);
 
-    void eliminar(Long id);
+    EstadoResponseDto eliminar(Long id);
+
+    EstadoResponseDto restaurar(Long id);
 }

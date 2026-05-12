@@ -23,55 +23,56 @@ public class GlobalExceptionHandler {
             errors.put(error.getField(), error.getDefaultMessage());
         }
 
-        return new ErrorResponseDto(
-            LocalDateTime.now(),
-            HttpStatus.BAD_REQUEST.value(),
-            "Error de Validación",
-            "Uno o más campos no cumplen con los requisitos",
-            errors);
+        return ErrorResponseDto.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error("Error de Validación")
+            .message("Uno o más campos no cumplen con los requisitos")
+            .validationErrors(errors)
+            .build();
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponseDto handleResourceNotFoundException(ResourceNotFoundException ex) {
-        return new ErrorResponseDto(
-            LocalDateTime.now(),
-            HttpStatus.NOT_FOUND.value(),
-            "Recurso no encontrado",
-            ex.getMessage(),
-            null);
+        return ErrorResponseDto.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.NOT_FOUND.value())
+            .error("Recurso no encontrado")
+            .message(ex.getMessage())
+            .build();
     }
 
     @ExceptionHandler(ConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponseDto handleConflictException(ConflictException ex) {
-        return new ErrorResponseDto(
-            LocalDateTime.now(),
-            HttpStatus.CONFLICT.value(),
-            "Datos duplicados",
-            ex.getMessage(),
-            null);
+        return ErrorResponseDto.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.CONFLICT.value())
+            .error("Datos duplicados")
+            .message(ex.getMessage())
+            .build();
     }
 
     @ExceptionHandler({ BadRequestException.class, IllegalArgumentException.class })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponseDto handleBadRequestExceptions(RuntimeException ex) {
-        return new ErrorResponseDto(
-            LocalDateTime.now(),
-            HttpStatus.BAD_REQUEST.value(),
-            "Solicitud Incorrecta",
-            ex.getMessage(),
-            null);
+        return ErrorResponseDto.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error("Solicitud Incorrecta")
+            .message(ex.getMessage())
+            .build();
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponseDto handleGenericException(Exception ex) {
-        return new ErrorResponseDto(
-            LocalDateTime.now(),
-            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            "Error Interno del Servidor",
-            "Ocurrió un error inesperado. Por favor, intente más tarde.",
-            null);
+        return ErrorResponseDto.builder()
+            .timestamp(LocalDateTime.now())
+            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+            .error("Error Interno del Servidor")
+            .message("Ocurrió un error inesperado. Por favor, intente más tarde.")
+            .build();
     }
 }
