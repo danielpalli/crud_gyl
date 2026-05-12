@@ -39,6 +39,10 @@ public class SecurityConfiguration {
                 authRequest
                     .requestMatchers("/api/login/**", "/api/register").permitAll()
                     .requestMatchers("/api/productos/**").authenticated()
+                    .requestMatchers("/api/tipo-productos/**").authenticated()
+                    .requestMatchers("/api/ventas/**").authenticated()
+                    .requestMatchers("/api/clientes/**").authenticated()
+
             )
             .sessionManagement(sessionManager ->
                 sessionManager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
