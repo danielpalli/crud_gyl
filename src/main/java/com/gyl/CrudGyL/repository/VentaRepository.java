@@ -27,19 +27,19 @@ public interface VentaRepository extends JpaRepository<Venta, Long>, JpaSpecific
     @EntityGraph(attributePaths = {"cliente", "detalles", "detalles.producto"})
     List<Venta> findDistinctByIdVentaIn(Collection<Long> ids);
 
-    @Query("SELECT new com.gyl.CrudGyL.dto.response.ResumenVentasResponseDto(" +
+    @Query("SELECT ResumenVentasResponseDto(" +
            "COALESCE(SUM(CASE WHEN v.fechaAnulacion IS NULL THEN v.total ELSE 0.0 END), 0.0), " +
            "COALESCE(SUM(CASE WHEN v.fechaAnulacion IS NOT NULL THEN v.total ELSE 0.0 END), 0.0)) " +
            "FROM Venta v")
     ResumenVentasResponseDto obtenerResumenGlobal();
 
-    @Query("SELECT new com.gyl.CrudGyL.dto.response.ResumenVentasResponseDto(" +
+    @Query("SELECT ResumenVentasResponseDto(" +
            "COALESCE(SUM(CASE WHEN v.fechaAnulacion IS NULL THEN v.total ELSE 0.0 END), 0.0), " +
            "COALESCE(SUM(CASE WHEN v.fechaAnulacion IS NOT NULL THEN v.total ELSE 0.0 END), 0.0)) " +
            "FROM Venta v WHERE v.fechaVenta BETWEEN :inicio AND :fin")
     ResumenVentasResponseDto obtenerResumenPorRango(@Param("inicio") LocalDate inicio, @Param("fin") LocalDate fin);
 
-    @Query("SELECT new com.gyl.CrudGyL.dto.response.ResumenPerfilClienteResponseDto(" +
+    @Query("SELECT ResumenPerfilClienteResponseDto(" +
            "COALESCE(SUM(CASE WHEN v.fechaAnulacion IS NULL THEN v.total ELSE 0.0 END), 0.0), " +
            "COALESCE(SUM(CASE WHEN v.fechaAnulacion IS NOT NULL THEN v.total ELSE 0.0 END), 0.0), " +
            "COUNT(v), " +
@@ -48,7 +48,7 @@ public interface VentaRepository extends JpaRepository<Venta, Long>, JpaSpecific
     ResumenPerfilClienteResponseDto obtenerResumenCliente(@Param("idCliente") Long idCliente);
 
     @Query("""
-            SELECT new com.gyl.CrudGyL.dto.response.TopProductoResponseDto(
+            SELECT TopProductoResponseDto(
                 p.idProducto,
                 p.nombreProducto,
                 SUM(d.cantidad),
