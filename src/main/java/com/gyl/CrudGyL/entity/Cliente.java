@@ -5,9 +5,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
-import java.time.Instant;
 
 @Entity
 @Table(name = "clientes")
@@ -15,8 +15,9 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Builder
-public class Cliente {
+public class Cliente extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idCliente;
@@ -45,7 +46,4 @@ public class Cliente {
 
     @Column(nullable = false, length = 50)
     private String nacionalidad;
-
-    @Column(nullable = true)
-    private Instant fechaBaja;
 }

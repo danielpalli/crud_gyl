@@ -14,7 +14,6 @@ import java.util.List;
 @Mapper(config = GlobalMapperConfig.class)
 public interface TipoProductoMapper {
     @Mapping(target = "idTipoProducto", ignore = true)
-    @Mapping(target = "fechaBaja", ignore = true)
     TipoProducto toEntity(TipoProductoRequestDto dto);
 
     TipoProductoResponseDto toDto(TipoProducto entity);
